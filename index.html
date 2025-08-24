@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apostila Direito — AD</title>
+  <meta name="description" content="Apostila Direito (AD) — Gerador de prompts jurídicos detalhados para GPT/Gemini" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#072C36" />
+  <style>
+    :root{
+      --blue-night:#072C36;
+      --blue:#074B68;
+      --water:#25C0BA;
+      --sun:#FF601A;
+      --sand:#FFEDDB;
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --text:#111111;
+      --muted:#555555;
+      --line:#d0d0d0;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    .wrap{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:10px;background:var(--blue-night);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .logo span{font-weight:700;font-size:14px;color:#fff}
+    h1{font-size:24px;margin:0;color:var(--blue-night)}
+    .sub{color:var(--muted);font-size:13px}
+
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.08);margin-bottom:16px}
+    .card h2{font-size:16px;margin:0 0 8px;color:var(--blue)}
+    .help{font-size:12px;color:var(--muted);margin:4px 0 12px}
+    label{display:block;font-size:12px;color:var(--blue-night);margin:10px 0 6px}
+    input,select,textarea{width:100%;background:#fff;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}
+    input::placeholder{color:#999}
+    .btn{appearance:none;border:1px solid var(--line);background:var(--water);color:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,.08);transition:.2s}
+    .btn:hover{background:var(--sun)}
+
+    .nav{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:12px}
+    .nav .left{display:flex;gap:10px}
+    .output{height:380px;resize:vertical}
+    footer{margin-top:24px;color:#777;font-size:12px;text-align:center}
+
+    .step{display:none}
+    .step.active{display:block}
+
+    /* Stepper visual */
+    .stepper{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+    .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:#fff;color:#777;font-weight:700;font-size:12px}
+    .dot.active{border-color:var(--water);background:var(--water);color:#fff}
+    .line{height:2px;background:#e5e5e5;flex:1}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"><span>AD</span></div>
+        <div>
+          <h1>Apostila Direito</h1>
+          <div class="sub">Gerador de Prompts</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Wizard -->
+    <div class="card" id="wizard">
+      <div class="stepper" id="stepper">
+        <div class="dot">1</div><div class="line"></div>
+        <div class="dot">2</div><div class="line"></div>
+        <div class="dot">3</div><div class="line"></div>
+        <div class="dot">4</div><div class="line"></div>
+        <div class="dot">5</div><div class="line"></div>
+        <div class="dot">6</div>
+      </div>
+      <div id="steps">
+        <div class="step" data-step="1">
+          <h2>1) Tema da apostila</h2>
+          <p class="help">Digite o tema/título.</p>
+          <label>Título da apostila</label>
+          <input id="titulo" placeholder="Ex.: Importunação Sexual — Art. 215‑A (CP)">
+        </div>
+
+        <div class="step" data-step="2">
+          <h2>2) Matéria</h2>
+          <p class="help">Selecione a disciplina (obrigatório).</p>
+          <label>Matéria</label>
+          <select id="materia">
+            <option value="" selected disabled>Selecione a matéria</option>
+            <option>Direito Penal</option>
+            <option>Processo Penal</option>
+            <option>Direito Civil</option>
+            <option>Processo Civil</option>
+            <option>Direito do Consumidor</option>
+            <option>Constitucional</option>
+            <option>Trabalho</option>
+          </select>
+        </div>
+
+        <div class="step" data-step="3">
+          <h2>3) Nível do estudante</h2>
+          <p class="help">Escolha o nível para calibrar didática e profundidade.</p>
+          <label>Nível</label>
+          <select id="nivel">
+            <option value="iniciante">Iniciante (2º‑4º semestre)</option>
+            <option value="intermediario" selected>Intermediário (5º‑7º)</option>
+            <option value="avancado">Avançado (8º‑10º / OAB)</option>
+          </select>
+        </div>
+
+        <div class="step" data-step="4">
+          <h2>4) Versão da apostila</h2>
+          <p class="help">Defina a profundidade.</p>
+          <label>Versão</label>
+          <select id="versao">
+            <option value="express">Express (resumo rápido)</option>
+            <option value="completa" selected>Completa (didática)</option>
+            <option value="avancada">Avançada (raio‑X detalhado)</option>
+          </select>
+        </div>
+
+        <div class="step" data-step="5">
+          <h2>5) Linguagem</h2>
+          <p class="help">Estilo de escrita da apostila.</p>
+          <label>Linguagem</label>
+          <select id="linguagem">
+            <option value="clara" selected>Clara e objetiva</option>
+            <option value="tecnica">Técnica/jurídica</option>
+            <option value="professor">Explicativa (estilo professor)</option>
+          </select>
+        </div>
+
+        <div class="step" data-step="6">
+          <h2>6) Revisar & gerar</h2>
+          <p class="help">Revise os dados antes de gerar o prompt.</p>
+          <div id="review" class="help" style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;color:#333"></div>
+          <div class="nav" style="margin-top:12px">
+            <div class="left"></div>
+            <button class="btn" id="gerar">Gerar prompt</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <div class="left">
+          <button class="btn" id="prev" disabled>Voltar</button>
+        </div>
+        <div>
+          <button class="btn" id="next">Próximo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompt final -->
+    <div class="card" id="result" hidden>
+      <h2>Prompt final (cole no GPT/Gemini)</h2>
+      <p class="help">Depois de gerar, copie o prompt abaixo.</p>
+      <textarea class="output" id="saida" placeholder="O prompt aparece aqui..."></textarea>
+      <div style="margin-top:10px;display:flex;gap:10px">
+        <button class="btn" id="copiar">Copiar prompt</button>
+        <button class="btn" id="novo">Nova pesquisa</button>
+      </div>
+    </div>
+
+    <footer>Apostila Direito • AD • apostiladireito.com.br</footer>
+  </div>
+
+  <script>
+    // ===== Conteúdo e geração de prompt =====
+    const bySubject = {
+      'Direito Penal': `### Estrutura específica — Direito Penal
+- **Tipificação**: bem jurídico, tipo objetivo/subjetivo, elementos, dolo/culpa, consumação/tentativa.
+- **Concurso de crimes e de pessoas**; qualificadoras; causas de aumento/diminuição.
+- **Penas e dosimetria** (arts. 59 e segs., CP): circunstâncias judiciais, agravantes/atenuantes, regime, substituição/suspensão.
+- **Aspectos processuais essenciais** (quando aplicável): competência, ação penal, rito, cadeia de custódia, provas, nulidades, recursos-chave.`,
+      'Processo Penal': `### Estrutura específica — Processo Penal
+- **Sistema acusatório** e juiz das garantias (status atual).
+- **Inquérito policial** e peças iniciais; **ação penal**.
+- **Prisão e medidas cautelares**; audiência de custódia.
+- **Provas** (ilicitude, cadeia de custódia) e nulidades.
+- **Ritos** e **recursos**; acordos (ANPP, colaboração).`,
+      'Direito Civil': `### Estrutura específica — Direito Civil
+- **Instituto central**: conceito, requisitos, efeitos, excludentes.
+- **Responsabilidade civil** (se aplicável): ato ilícito, dano (material/moral/estético), nexo, culpa; critérios de quantificação.
+- **Obrigações e contratos**: formação, validade, interpretação, inadimplemento, cláusulas especiais.
+- **Tutelas**: preventiva, reparatória, específica e perdas e danos.`,
+      'Processo Civil': `### Estrutura específica — Processo Civil
+- **Princípios** e **competência**.
+- **Petição inicial**, saneamento e organização do processo.
+- **Tutelas provisórias** (urgência/evidência).
+- **Provas** e audiência.
+- **Sentença e recursos** (apelação, agravos); **precedentes** (arts. 926/927 CPC), IRDR/IAC; negócios processuais.`,
+      'Direito do Consumidor': `### Estrutura específica — Direito do Consumidor (CDC)
+- **Sujeitos e conceitos**: consumidor, fornecedor, produto/serviço.
+- **Responsabilidade objetiva**; vício x fato do produto/serviço.
+- **Práticas abusivas**, publicidade e cláusulas abusivas.
+- **Garantias** (legal/contratual) e inversão do ônus da prova.
+- **Interações com CPC e responsabilidade civil**.`,
+      'Constitucional': `### Estrutura específica — Constitucional
+- **Princípios fundamentais** e organização do Estado.
+- **Direitos fundamentais** (aplicabilidade, restrições, colisões).
+- **Controle de constitucionalidade** (difuso/concentrado: ADI, ADC, ADPF).
+- **Remédios constitucionais** (habeas corpus, mandado de segurança etc.).
+- **Jurisprudência paradigmática do STF**.`,
+      'Trabalho': `### Estrutura específica — Trabalho
+- **Relação de emprego**: vínculo, terceirização, subordinação/pejotização.
+- **Jornada/intervalos**, remuneração e verbas (férias, 13º, FGTS).
+- **Rescisão e estabilidade**; dano moral.
+- **Processo do trabalho**: rito, provas, ônus da prova, recursos.
+- **Súmulas/OJs do TST** relevantes.`,
+    };
+
+    const sourcesBySubject = {
+      'Direito Penal': `- **CP/CPP no Planalto**; **STF/STJ** (acórdãos e súmulas).`,
+      'Processo Penal': `- **CPP**; **STF/STJ**; CNJ (cadeia de custódia).`,
+      'Direito Civil': `- **CC/CDC no Planalto**; **STJ** (temas repetitivos/súmulas).`,
+      'Processo Civil': `- **CPC/2015** no Planalto; **STJ** (precedentes, temas), CNJ.`,
+      'Direito do Consumidor': `- **CDC**; **STJ** (responsabilidade objetiva, vícios/fatos), Senacon.`,
+      'Constitucional': `- **CF/88** no Planalto; **STF** (ADIs/ADPFs leading cases).`,
+      'Trabalho': `- **CLT** no Planalto; **TST** (súmulas e OJs), STF (temas com repercussão geral).`,
+    };
+
+    const today = new Date().toISOString().slice(0,10);
+
+    function buildPrompt({titulo,materia,nivel,versao,linguagem}){
+      const espec = bySubject[materia] || '';
+      const font = sourcesBySubject[materia] || '';
+      let detalhe = '';
+      if(versao==='express'){
+        detalhe = `### Versão escolhida: EXPRESS (resumo rápido)
+- Conteúdo em até 3 páginas.
+- Foque em conceitos‑chave, jurisprudência essencial e checklist final.
+- Estrutura enxuta e objetiva.`;
+      } else if(versao==='completa'){
+        detalhe = `### Versão escolhida: COMPLETA (didática)
+- Estrutura completa com perguntas‑chave, análise material/processual, jurisprudência, doutrina, casos práticos, questões e resumo executivo.`;
+      } else if(versao==='avancada'){
+        detalhe = `### Versão escolhida: AVANÇADA (raio‑X detalhado)
+- Aprofunde divergências doutrinárias e jurisprudenciais.
+- Inclua quadros comparativos, tabelas de teses e análise crítica.
+- Indicado para estudo avançado/TCC/concursos de alto nível.`;
+      }
+
+      let estilo = '';
+      if(linguagem==='clara') estilo = '- Linguagem clara, objetiva e acessível.';
+      if(linguagem==='tecnica') estilo = '- Linguagem técnica, com termos jurídicos precisos.';
+      if(linguagem==='professor') estilo = '- Linguagem explicativa, estilo professor, com exemplos práticos.';
+
+      return `Você é professor de **${materia}** no Brasil e deve gerar uma **APOSTILA ${versao.toUpperCase()}** sobre **${titulo}** para um estudante de nível **${nivel}**. Atualize-se até **${today}** usando pesquisa na web quando disponível.
+
+### Objetivo
+Entregar material claro, prático e confiável para estudo e revisão.
+
+${detalhe}
+
+### Regras gerais
+${estilo}
+- Parágrafos curtos (≤2 linhas).
+- Estruture com headings e listas; use tabelas markdown quando ajudar.
+- **Não invente** jurisprudência. Quando incerto, sinalize **[ATUALIZAR]** ao lado do ponto.
+
+### Estrutura base (comum)
+1. **Introdução rápida** (contexto e mapa mental).
+2. **Perguntas-chave** que o aluno deve saber responder.
+3. **Núcleo teórico aplicado** ao tema (definições, elementos, requisitos, exceções).
+4. **Procedimentos/Aplicação prática** (quando houver): passos, prazos, peças, recursos).
+5. **Jurisprudência relevante (últimos 5 anos, quando possível)**: cada item com **órgão**, **nº do processo/tema**, **relator**, **data**, **tese em 1–2 linhas** e **link oficial**.
+6. **Doutrina essencial**: 3–5 ideias‑força (autor/obra entre parênteses, sem citação longa).
+7. **Casos práticos**: 3–5 hipóteses com análise passo a passo.
+8. **Questões de OAB/concursos**: 3–5, com gabarito comentado e fonte/ano.
+9. **Resumo executivo**: checklist em até 10 bullets.
+
+${espec}
+
+### Pesquisa e Fontes (obrigatório)
+- HABILITE a navegação/pesquisa. Priorize fontes **oficiais** brasileiras.
+${font}
+- Cite **links oficiais**, datas e identificação do julgado/tema. Evite blogs sem fonte primária.
+
+### Formatação
+- Markdown puro (#, ##, ###, -, 1.).
+- Destaque termos-chave em **negrito**.
+- Produza texto final **sem preâmbulos** e **sem comentários fora da apostila**.
+
+### Saída
+Retorne **somente** a apostila completa em markdown para **${titulo}**.
+`;
+    }
+
+    // ===== Wizard logic (simplificado + stepper) =====
+    const stepsEls = Array.from(document.querySelectorAll('#steps .step'));
+    const dots = Array.from(document.querySelectorAll('#stepper .dot'));
+    function updateStepper(){ dots.forEach((d,i)=> d.classList.toggle('active', i<=current)); }
+    const out = document.getElementById('saida');
+    const result = document.getElementById('result');
+    let current = 0;
+
+    function showStep(idx){
+      stepsEls[current].classList.remove('active');
+      stepsEls[current].hidden = true;
+      stepsEls[idx].hidden = false;
+      stepsEls[idx].classList.add('active');
+      current = idx;
+      updateStepper();
+      document.getElementById('prev').disabled = idx===0;
+      document.getElementById('next').textContent = idx===stepsEls.length-1 ? 'Finalizar' : 'Próximo';
+      if(idx===stepsEls.length-1){
+        const d = collect();
+        document.getElementById('review').innerHTML = `
+          <b>Tema:</b> ${d.titulo || '<i>não informado</i>'}<br>
+          <b>Matéria:</b> ${d.materia || '<i>não selecionada</i>'}<br>
+          <b>Nível:</b> ${d.nivel}<br>
+          <b>Versão:</b> ${d.versao}<br>
+          <b>Linguagem:</b> ${d.linguagem}`;
+      }
+    }
+
+    function collect(){
+      return {
+        titulo: document.getElementById('titulo').value.trim(),
+        materia: document.getElementById('materia').value,
+        nivel: document.getElementById('nivel').value,
+        versao: document.getElementById('versao').value,
+        linguagem: document.getElementById('linguagem').value
+      };
+    }
+
+    document.getElementById('next').addEventListener('click', ()=>{
+      if(current < stepsEls.length-1) showStep(current+1);
+    });
+    document.getElementById('prev').addEventListener('click', ()=>{ if(current > 0) showStep(current-1); });
+
+    document.getElementById('gerar').addEventListener('click', ()=>{
+      const data = collect();
+      if(!data.titulo || !data.materia){ alert('Revise: tema e matéria são obrigatórios.'); return; }
+      out.value = buildPrompt(data);
+      result.hidden = false; result.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+
+    document.getElementById('copiar').addEventListener('click', ()=>{
+      if(!out.value){ alert('Gere o prompt primeiro.'); return; }
+      out.select(); document.execCommand('copy');
+      const btn = document.getElementById('copiar');
+      const old = btn.textContent; btn.textContent = 'Copiado!';
+      setTimeout(()=> btn.textContent = old, 1200);
+    });
+
+    document.getElementById('novo').addEventListener('click', ()=>{
+      document.getElementById('titulo').value='';
+      document.getElementById('materia').value='';
+      document.getElementById('nivel').value='intermediario';
+      document.getElementById('versao').value='completa';
+      document.getElementById('linguagem').value='clara';
+      out.value=''; result.hidden=true; showStep(0); window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    // Inicialização
+    stepsEls.forEach((s,i)=>{ s.hidden = i!==0; s.classList.toggle('active', i===0); });
+    updateStepper();
+
+    // PWA: service worker
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+  </script>
+</body>
+</html>
