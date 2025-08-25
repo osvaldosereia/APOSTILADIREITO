@@ -1,0 +1,9 @@
+{
+  "default": [
+    { "label": "Direito Constitucional — Manuais e Tratados", "url": "https://www.amazon.com.br/s?k=direito+constitucional&tag=apostiladirei-20" },
+    { "label": "Direito Civil — Coleções Clássicas",          "url": "https://www.amazon.com.br/s?k=direito+civil&tag=apostiladirei-20" },
+    { "label": "Direito Penal — Parte Geral/Especial",        "url": "https://www.amazon.com.br/s?k=direito+penal&tag=apostiladirei-20" },
+    { "label": "Processo Civil — CPC Comentado",              "url": "https://www.amazon.com.br/s?k=cpc+comentado&tag=apostiladirei-20" },
+    { "label": "Vade Mecum Atualizado",                       "url": "https://www.amazon.com.br/s?k=vade+mecum&tag=apostiladirei-20" }
+  ]
+}
