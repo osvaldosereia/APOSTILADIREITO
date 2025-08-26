@@ -134,8 +134,8 @@
           <option value="debate">Debate/Reflexão</option>
           <option value="atualizacao">Contexto Atualizado</option>
           <option value="plano">Plano de Estudo</option>
-          <option value="Apresentacao Oral">Apresentação Oral</option>
-          <option value="Slide">Slide</option>
+          <option value="apresentacao">Apresentação Oral</option>
+          <option value="slide">Slide</option>
           <option value="jurisprudencia">Jurisprudência</option>
         </select>
       </div>
@@ -167,8 +167,7 @@
   <section id="tab-dicas" class="tab-content">
     <main class="panel">
       <h2 class="label">Dicas de Uso — como cada objetivo gera a resposta</h2>
-      <div class="field" style="white-space:pre-wrap">
-<b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos-chave, mais 2 erros comuns e um mini-exemplo. 
+      <div class="field" style="white-space:pre-wrap"><b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos-chave, mais 2 erros comuns e um mini-exemplo. 
 
 <b>Resumo Objetivo</b> — conceito em 2 linhas, base legal, estrutura, 3 diferenças fáceis de confundir, tendências, 3 pegadinhas e 2 mini-cases.
 
@@ -289,7 +288,7 @@ Estrutura:
 Recursos: headings (H2–H3), listas, termos-chave em **negrito**, exemplos narrados em forma de caso.  
 Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
 
-Fecho: resumo executivo em 2–3 frases com recomendações práticas finais. ,
+Fecho: resumo executivo em 2–3 frases com recomendações práticas finais.`,
       simulado: (tema) => `Você é um **professor de Direito** no Brasil, especialista em preparação para provas da OAB e concursos.  
 Persona: avaliador exigente, mas didático, que usa o simulado como forma de ensino.  
 Linguagem: objetiva, clara, sem juridiquês excessivo; explicações sempre conectadas à prática jurídica.  
@@ -351,7 +350,7 @@ Recursos: headings (H2–H3), diálogos curtos identificados por personagens, te
 Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
 
 Fecho: resumo executivo (2–3 frases) + desafio prático ao estudante.`,
-      atualizacao: (tema) => Você é um **jurista analista de jurisprudência consolidada** no Brasil.  
+      atualizacao: (tema) => `Você é um **jurista analista de jurisprudência consolidada** no Brasil.  
 Persona: pesquisador criterioso e atualizado, que mostra o “estado da arte” da Justiça sobre o tema.  
 Linguagem: clara, objetiva e técnica, sem juridiquês excessivo.  
 
@@ -369,7 +368,7 @@ Regras:
 - Pode citar súmulas ou enunciados consolidados.  
 - Sempre dar ênfase ao **norte prático**: “o que prevalece hoje na Justiça”.  
 
-Fecho: síntese em 2–3 frases, apontando segurança conceitual para o estudante. ,
+Fecho: síntese em 2–3 frases, apontando segurança conceitual para o estudante.`,
       plano: (tema) => `Você é um **coach de estudos jurídicos** especialista em memorização.  
 Persona: motivador, organizado.  
 Linguagem: objetiva e encorajadora.  
@@ -386,7 +385,7 @@ Recursos: listas e tabela simples em texto.
 Regras: sem links.  
 
 Fecho: frase motivadora (2 linhas) + fontes (até 5).`,
-      Apresentacao Oral : (tema) => Você é um **professor-coach de oratória jurídica** no Brasil, especialista em transformar conteúdo jurídico em fala clara e envolvente.  
+      apresentacao: (tema) => `Você é um **professor-coach de oratória jurídica** no Brasil, especialista em transformar conteúdo jurídico em fala clara e envolvente.  
 Persona: didático, direto e confiante; orienta como se estivesse **ensaiando junto** com o estudante.  
 Linguagem: frases curtas, ritmo de fala, termos-chave em **negrito**; evitar juridiquês desnecessário.
 
@@ -426,7 +425,7 @@ Recursos: headings (H2–H3), listas numeradas, marcações **[ENTONAÇÃO] [PAU
 Regras: sem links; súmulas só se 100% seguras; não citar números de processos/acórdãos.  
 
 Fecho: lembrete motivacional curto (“Você domina o mapa: defina, mostre os pilares, ilustre o caso e feche com o entendimento majoritário.”).`,
-     jurisprudencia: (tema) => `Você é um **jurista analista de jurisprudência**.  
+      jurisprudencia: (tema) => `Você é um **jurista analista de jurisprudência**.  
 Persona: pesquisador criterioso, atualizado, conecta decisões e impactos práticos.  
 Linguagem: clara, objetiva e técnica, sem juridiquês desnecessário.  
 
@@ -446,7 +445,7 @@ Regras:
 - Pesquise exclusivamente em **notícias jurídicas, artigos acadêmicos e portais confiáveis**.  
 - A análise deve se basear **no conteúdo publicado no site**, extraindo a informação e comentando brevemente.  
 - A saída deve conter apenas a lista numerada, sem comentários adicionais.`,
-      Slide: (tema) => Você é um **designer instrucional de Direito** no Brasil, especialista em transformar conteúdo jurídico em slides claros e impactantes.  
+      slide: (tema) => `Você é um **designer instrucional de Direito** no Brasil, especialista em transformar conteúdo jurídico em slides claros e impactantes.  
 Persona: professor visual, que organiza ideias em blocos simples e memoráveis.  
 Linguagem: objetiva, frases curtas, termos-chave em **negrito**; sem juridiquês.  
 
@@ -470,7 +469,7 @@ Recursos:
 
 Regras: sem links; súmulas só se 100% seguras; não citar números de processos/acórdãos.  
 
-Fecho: resumo final em 1 frase para reforço de memorização. ,
+Fecho: resumo final em 1 frase para reforço de memorização.`
     };
 
     const strategyEl = document.getElementById('strategy');
@@ -489,7 +488,7 @@ Fecho: resumo final em 1 frase para reforço de memorização. ,
       const map={
         explicacao:'Explicação Básica', resumo:'Resumo Objetivo', artigo:'Análise Detalhada', aplicacao:'Aplicação Prática',
         simulado:'Exercícios/Testes', faq:'FAQ', debate:'Debate/Reflexão', atualizacao:'Contexto Atualizado',
-        plano:'Plano de Estudo', sustentacao:'Apresentação em Sala', jurisprudencia:'Jurisprudência'
+        plano:'Plano de Estudo', apresentacao:'Apresentação Oral', jurisprudencia:'Jurisprudência', slide:'Slide'
       }; return map[v]||v;
     }
 
