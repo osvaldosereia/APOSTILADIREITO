@@ -76,7 +76,6 @@
     <button class="tab-btn" aria-selected="true" aria-controls="tab-gerador" id="tabbtn-gerador">Gerador</button>
     <button class="tab-btn" aria-selected="false" aria-controls="tab-book" id="tabbtn-book">Book</button>
     <button class="tab-btn" aria-selected="false" aria-controls="tab-dicas" id="tabbtn-dicas">Dicas</button>
-    <button class="tab-btn" aria-selected="false" aria-controls="tab-sugestoes" id="tabbtn-sugestoes">Sugestões</button>
   </nav>
 
   <!-- Gerador -->
@@ -127,19 +126,19 @@
     <main class="panel">
       <h2 class="label">Dicas de Uso — como cada objetivo gera a resposta</h2>
       <div class="field" style="white-space:pre-wrap">
-<b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos‑chave, mais 2 erros comuns e um mini‑exemplo. 
+<b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos-chave, mais 2 erros comuns e um mini-exemplo. 
 
-<b>Resumo Objetivo</b> — conceito em 2 linhas, base legal, estrutura, 3 diferenças fáceis de confundir, tendências, 3 pegadinhas e 2 mini‑cases.
+<b>Resumo Objetivo</b> — conceito em 2 linhas, base legal, estrutura, 3 diferenças fáceis de confundir, tendências, 3 pegadinhas e 2 mini-cases.
 
 <b>Análise Detalhada</b> — artigo acadêmico: introdução (problema, relevância, hipótese), desenvolvimento (conceitos, correntes, análise crítica, jurisprudência), conclusão (síntese + proposta).
 
-<b>Aplicação Prática</b> — caso fictício, enquadramento jurídico, solução provável, mini‑modelo de peça e checklist.
+<b>Aplicação Prática</b> — caso fictício, enquadramento jurídico, solução provável, mini-modelo de peça e checklist.
 
 <b>Exercícios/Testes</b> — 5 questões (2 fáceis, 2 médias, 1 difícil) com gabarito comentado.
 
 <b>FAQ</b> — 15 perguntas essenciais respondidas em até 3 linhas, mais 2 confusões comuns corrigidas.
 
-<b>Debate/Reflexão</b> — problema central, 3 argumentos pró e 3 contra, 1 dilema prático, perguntas‑guia.
+<b>Debate/Reflexão</b> — problema central, 3 argumentos pró e 3 contra, 1 dilema prático, perguntas-guia.
 
 <b>Contexto Atualizado</b> — panorama legislativo e jurisprudencial recente, impactos práticos, pontos controversos.
 
@@ -154,25 +153,12 @@
     </main>
   </section>
 
-  <!-- Sugestões -->
-  <section id="tab-sugestoes" class="tab-content">
-    <main class="panel">
-      <h2 class="label">Sugira Melhorias</h2>
-      <div class="field-wrap"><input id="sug-nome" class="field" placeholder="Seu nome"/></div>
-      <div class="field-wrap"><input id="sug-email" class="field" placeholder="Seu e-mail" type="email"/></div>
-      <div class="field-wrap"><textarea id="sug-texto" class="field" placeholder="Digite sua sugestão"></textarea></div>
-      <button id="sug-enviar" class="btn btn-primary" type="button">Enviar</button>
-      <p id="sug-msg" class="toast"></p>
-    </main>
-  </section>
-
   <div class="footer">@osvaldosereiajr</div>
 
   <nav class="tabbar" role="tablist">
     <button aria-selected="true" aria-controls="tab-gerador" id="m-tabbtn-gerador"><span class="lbl">Gerar</span></button>
     <button aria-selected="false" aria-controls="tab-book" id="m-tabbtn-book"><span class="lbl">Book</span></button>
     <button aria-selected="false" aria-controls="tab-dicas" id="m-tabbtn-dicas"><span class="lbl">Dicas</span></button>
-    <button aria-selected="false" aria-controls="tab-sugestoes" id="m-tabbtn-sugestoes"><span class="lbl">Sugestões</span></button>
   </nav>
 
   <script>
@@ -182,7 +168,7 @@
     loadRandomQuote();
 
     // Tabs
-    const tabIds=['gerador','book','dicas','sugestoes'];
+    const tabIds=['gerador','book','dicas'];
     function activateTab(id){for(const t of tabIds){document.getElementById('tab-'+t).classList.toggle('is-active',t===id);document.getElementById('tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));document.getElementById('m-tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));}}
     for(const t of tabIds){document.getElementById('tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));document.getElementById('m-tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));}
 
@@ -380,12 +366,33 @@ Fecho: cite até 5 **fontes** (título + veículo/autor + ano, sem links).`,
     btnReset.addEventListener('click', resetAll);
     themeEl.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='enter'){generate();}});
 
+    function strategyHumanName(v){
+      const map={
+        explicacao:'Explicação Básica', resumo:'Resumo Objetivo', artigo:'Análise Detalhada', aplicacao:'Aplicação Prática',
+        simulado:'Exercícios/Testes', faq:'FAQ', debate:'Debate/Reflexão', atualizacao:'Contexto Atualizado',
+        plano:'Plano de Estudo', sustentacao:'Apresentação em Sala', jurisprudencia:'Jurisprudência'
+      }; return map[v]||v;
+    }
+
     function generate(){
       const s = strategyEl.value; const t = (themeEl.value||'').trim();
       if(!s){ alert('Selecione o objetivo.'); return; }
       if(!t){ alert('Digite o tema.'); themeEl.focus(); return; }
       const tpl = TEMPLATES[s]; if(!tpl){ alert('Estratégia inválida.'); return; }
-      resultEl.value = tpl(t);
+      const out = tpl(t);
+      resultEl.value = out;
+
+      // Atualiza Book local automaticamente (máx. 500)
+      let bookData=[]; 
+      try{ bookData = JSON.parse(localStorage.getItem('book_data_v1')||'[]'); if(!Array.isArray(bookData)) bookData=[]; }catch{ bookData=[]; }
+      const entry = { objetivo: strategyHumanName(s), tema: t, prompt: out, ts: Date.now() };
+      bookData.unshift(entry);
+      if(bookData.length>500) bookData = bookData.slice(0,500);
+      try{ localStorage.setItem('book_data_v1', JSON.stringify(bookData)); }catch{}
+
+      // Se Book estiver aberto, re-renderiza
+      if(document.getElementById('tab-book').classList.contains('is-active')){ clearBookUI(); renderBatch(); }
+
       window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
     }
 
@@ -406,34 +413,36 @@ Fecho: cite até 5 **fontes** (título + veículo/autor + ano, sem links).`,
 
     function resetAll(){ strategyEl.value=''; themeEl.value=''; resultEl.value=''; window.scrollTo({top:0,behavior:'smooth'}); }
 
-    // Book (simulado)
-    const BOOK_TOTAL=500,PAGE_SIZE=10;let bookCursor=0;const bookWrap=document.getElementById('book-list');
+    // ===== Book — persistência local (localStorage) =====
+    const BOOK_KEY='book_data_v1';
+    const PAGE_SIZE=10;
+    let bookData=[]; let bookCursor=0; const bookWrap=document.getElementById('book-list');
+
+    function loadBook(){ try{ bookData = JSON.parse(localStorage.getItem(BOOK_KEY)||'[]'); if(!Array.isArray(bookData)) bookData=[]; }catch{ bookData=[]; } }
+    function saveBook(){ try{ localStorage.setItem(BOOK_KEY, JSON.stringify(bookData)); }catch{} }
     function truncate150(s){return (s||'').length>150?s.slice(0,150)+'…':s}
-    function fakeRow(i){const objetivos=['Explicação Básica','Resumo Objetivo','Análise Detalhada','Aplicação Prática','Exercícios/Testes','FAQ','Debate/Reflexão','Contexto Atualizado','Plano de Estudo','Apresentação em Sala','Jurisprudência'];const temas=['Princípio da Legalidade no Direito Penal — foco OAB','Tutela de urgência (art. 300, CPC/2015)','Abandono socioafetivo e responsabilidade civil','Contrato de compra e venda e vícios redibitórios','Concurso de crimes: material, formal, continuado'];const objetivo=objetivos[i%objetivos.length];const tema=temas[i%temas.length];const prompt=`[${objetivo}] Tema: ${tema}`;return {objetivo,tema,prompt};}
-    function renderBatch(){if(!bookWrap) return;const end=Math.min(bookCursor+PAGE_SIZE,BOOK_TOTAL);const frag=document.createDocumentFragment();for(let i=bookCursor;i<end;i++){const {objetivo,tema,prompt}=fakeRow(i);const el=document.createElement('div');el.className='book-item';el.innerHTML=`<div class="book-meta"><div class="book-obj">${objetivo}</div><div class="book-tema">${truncate150(tema)}</div></div><div><button class="chipbtn" data-prompt="${prompt.replace(/"/g,'&quot;')}">Copiar</button></div>`;frag.appendChild(el);}bookWrap.appendChild(frag);bookCursor=end;}
-    function onScroll(){if(!bookWrap) return;const near=bookWrap.scrollTop+bookWrap.clientHeight>=bookWrap.scrollHeight-8;if(near&&bookCursor<BOOK_TOTAL)renderBatch();}
-    bookWrap?.addEventListener('scroll',onScroll);
-    const _activate=activateTab;activateTab=function(id){_activate(id);if(id==='book'&&bookCursor===0)renderBatch();}
 
-    // Copiar (delegação)
-    document.addEventListener('click',async e=>{const btn=e.target.closest('.chipbtn');if(!btn||!btn.dataset.prompt)return;try{await navigator.clipboard.writeText(btn.dataset.prompt);btn.textContent='Copiado!';setTimeout(()=>btn.textContent='Copiar',1200);}catch{alert('Não foi possível copiar.');}});
+    function clearBookUI(){ if(bookWrap){ bookWrap.innerHTML=''; bookCursor=0; } }
+    function renderBatch(){
+      if(!bookWrap) return; const end=Math.min(bookCursor+PAGE_SIZE, bookData.length); const frag=document.createDocumentFragment();
+      for(let i=bookCursor;i<end;i++){
+        const {objetivo,tema,prompt}=bookData[i];
+        const el=document.createElement('div'); el.className='book-item';
+        el.innerHTML=`<div class="book-meta"><div class="book-obj">${objetivo||'—'}</div><div class="book-tema">${truncate150(tema||'')}</div></div><div><button class="chipbtn" data-prompt="${String(prompt||'').replace(/"/g,'&quot;')}">Copiar</button></div>`;
+        frag.appendChild(el);
+      }
+      bookWrap.appendChild(frag); bookCursor=end;
+    }
+    function onScroll(){ if(!bookWrap) return; const near=bookWrap.scrollTop+bookWrap.clientHeight>=bookWrap.scrollHeight-8; if(near && bookCursor<bookData.length) renderBatch(); }
+    bookWrap?.addEventListener('scroll', onScroll);
 
-    // Sugestões envio
-    document.getElementById('sug-enviar').addEventListener('click',()=>{
-      const nome=document.getElementById('sug-nome').value.trim();
-      const email=document.getElementById('sug-email').value.trim();
-      const texto=document.getElementById('sug-texto').value.trim();
-      const msg=document.getElementById('sug-msg');
-      if(!nome||!email||!texto){msg.textContent='Preencha nome, e-mail e a sugestão.';return;}
-      const subj=encodeURIComponent('Sugestão de melhoria — AD Gerador');
-      const body=encodeURIComponent(`Nome: ${nome}
-Email: ${email}
+    // carrega quando abrir a aba Book
+    const _activate=activateTab; activateTab=function(id){ _activate(id); if(id==='book'){ if(!bookData.length){ loadBook(); } if(bookCursor===0){ renderBatch(); } } }
 
-Sugestão:
-${texto}`);
-      msg.textContent='Abrindo seu app de e-mail…';
-      window.location.href=`mailto:junior.sereia@hotmail.com?subject=${subj}&body=${body}`;
-      setTimeout(()=>{ msg.textContent='Obrigado! Se o e-mail foi aberto, basta enviar.'; }, 800);
+    // Copiar (delegação Book)
+    document.addEventListener('click',async e=>{
+      const btn=e.target.closest('.chipbtn'); if(!btn||!btn.dataset.prompt) return;
+      try{ await navigator.clipboard.writeText(btn.dataset.prompt); btn.textContent='Copiado!'; setTimeout(()=>btn.textContent='Copiar',1200);}catch{ alert('Não foi possível copiar.'); }
     });
   </script>
 </body>
