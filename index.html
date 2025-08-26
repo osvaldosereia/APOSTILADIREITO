@@ -97,6 +97,7 @@
           <option value="atualizacao">Contexto Atualizado</option>
           <option value="plano">Plano de Estudo</option>
           <option value="sustentacao">Apresentação em Sala</option>
+          <option value="jurisprudencia">Jurisprudência</option>
         </select>
       </div>
 
@@ -316,6 +317,31 @@ Recursos: narrativa contínua em parágrafos; transições retóricas (“Senhor
 Regras: sem links; jurisprudência só se 100% segura.  
 
 Fecho: frase final de impacto + fontes (até 5).`,
+
+      jurisprudencia: (tema) => `Você é um **jurista analista de jurisprudência**.  
+Persona: pesquisador criterioso, atualizado, conecta decisões e impactos práticos.  
+Linguagem: clara, objetiva e técnica, sem juridiquês desnecessário.  
+
+Tarefa: Faça um **Radar de Jurisprudências, Súmulas e Acórdãos (2020–2025)** sobre **${tema}**, entregando exatamente **15 itens** seguros e verificáveis.  
+
+Estrutura:  
+1) Cada item deve conter:  
+   - Tribunal / Súmula / Órgão.  
+   - Número do processo ou da súmula (se houver).  
+   - Ano do julgamento/publicação.  
+   - Tese central resumida em 2–3 linhas.  
+   - Impacto prático (na advocacia, doutrina ou jurisprudência).  
+2) Inclua apenas decisões e súmulas confirmadas em portais jurídicos ou bases confiáveis.  
+3) Se necessário, use reafirmações recentes de súmulas ou precedentes paradigmáticos.  
+
+Recursos: formatação em lista numerada (1 a 15); texto conciso, bem organizado.  
+Regras:  
+- Não invente decisões.  
+- Jurisprudência só se 100% segura.  
+- Não acrescente nada além dos 15 itens.  
+
+Fecho: cite até 5 **fontes** (título + veículo/autor + ano, sem links).`,
+
     };
 
     /* ========== Lógica dos botões ========== */
