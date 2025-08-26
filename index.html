@@ -4,201 +4,176 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a3a4a" />
-  <title>AD - Gerador de Prompt</title>
+  <title>AD - Notícias</title>
   <style>
-    :root{
-      --ink:#0b2f3b;
-      --bg:#ffffff;
-      --panel:#63cfc1;
-      --panel-2:#e9f2f5;
-      --btn:#0b3b4a;
-      --btn-copy:#6b7785;
-      --btn-reset:#4b5563;
-      --border:#d8e2e7;
-      --topbar:#63d1c3;
-    }
+    :root{ --ink:#0b2f3b; --bg:#ffffff; --panel:#63cfc1; --panel-2:#e9f2f5; --btn:#0b3b4a; --border:#d8e2e7; --radius:28px; }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;background:var(--bg);color:var(--ink);padding-top:64px}
-
-    .topbar{
-      position:fixed;top:0;left:0;right:0;height:64px;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 18px;background:var(--topbar);z-index:1000;
-      border-bottom:1px solid var(--border)
-    }
-    .topbar .brand{font-weight:900;letter-spacing:.2px;color:#fff}
-    .topbar .right{display:flex;align-items:center;gap:12px}
-
-    .insta-link{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:28px;height:28px;border-radius:6px;text-decoration:none;
-      transition:transform .12s ease;
-    }
-    .insta-link:hover{transform:translateY(-1px)}
-    .insta-link svg{display:block;width:100%;height:100%}
-
-    .hero{display:grid;gap:8px;max-width:960px;margin:0 auto;padding:40px 20px 24px;align-items:start}
-    .quote{font-weight:800;line-height:1.05;color:var(--ink);font-size:clamp(28px,6vw,64px)}
-    .author{font-style:italic;font-size:clamp(14px,2.2vw,22px);opacity:.85}
-
-    .panel{background:var(--panel);border-radius:32px;padding:24px;max-width:960px;margin:0 auto}
-    @media (min-width:861px){.panel{padding:32px;box-shadow:0 10px 28px rgba(0,0,0,.06)}}
-
-    .field-wrap{margin:16px 0 20px}
+    .topbar{position:fixed;inset:0 0 auto 0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#ffffff;z-index:1000;border-bottom:1px solid var(--border)}
+    .topbar .brand{font-weight:900;letter-spacing:.2px;color:var(--ink);text-decoration:none}
+    .topbar .right{display:flex;gap:10px;align-items:center}
+    .topbar .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid transparent}
+    .topbar .icon-btn[aria-current="page"]{border-color:var(--border);background:var(--panel-2)}
+    .topbar .icon-btn svg{width:22px;height:22px}
+    .hero{display:grid;grid-template-columns:1fr;gap:8px;max-width:1100px;margin:0 auto;padding:24px 20px 8px;align-items:start}
+    .hero h1{margin:0;font-weight:900;letter-spacing:.2px;color:var(--ink);font-size:clamp(22px,4.8vw,42px)}
+    .sub{opacity:.85;font-size:clamp(13px,2vw,18px)}
+    .panel{background:var(--panel);border-top-left-radius:42px;border-top-right-radius:42px;padding:28px 20px 40px}
+    .section{max-width:1100px;margin:0 auto}
+    .field-wrap{margin:16px 0 18px}
     .label{font-weight:900;font-size:clamp(16px,2.6vw,26px);color:#08333e;margin:0 0 12px}
-    .field{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:18px;padding:16px;color:#11323c;outline:none}
-    textarea.field{min-height:120px;resize:vertical}
-
-    .actions-out{display:flex;flex-direction:column;gap:14px}
-    .actions-buttons{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{border:none;border-radius:999px;padding:10px 18px;font-weight:800;letter-spacing:.3px;color:#fff;cursor:pointer}
+    .field{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:22px;padding:12px 14px;color:#11323c;outline:none}
+    .news-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media (max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.grid{grid-template-columns:1fr}}
+    .card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px}
+    .site{font-size:12px;opacity:.8}
+    .title{font-weight:800;line-height:1.18}
+    .meta{font-size:12px;opacity:.75}
+    .btn{display:inline-block;border:none;border-radius:999px;padding:12px 18px;font-weight:900;letter-spacing:.3px;color:#fff;cursor:pointer}
     .btn-primary{background:var(--btn)}
-    .btn-copy{background:var(--btn-copy);font-size:14px;padding:8px 14px}
-    .btn-reset{background:var(--btn-reset)}
-
-    .output{background:var(--panel-2);border:1px solid var(--border);border-radius:18px;min-height:160px;padding:16px;color:#16333b;width:100%;resize:vertical}
-
-    .chipbtn{border:1px solid var(--border);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:13px}
-    .chipbtn:active{transform:translateY(1px)}
-    .book-list{max-height:60vh;overflow:auto;border:1px solid var(--border);border-radius:16px;background:#fff}
-    .book-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border)}
-    .book-item:last-child{border-bottom:none}
-    .book-meta{min-width:220px;max-width:calc(100% - 120px)}
-    .book-obj{font-weight:800;color:#08333e}
-    .book-tema{opacity:.9;margin-top:4px;font-size:14px}
-
-    .tabs{max-width:960px;margin:16px auto;padding:0 20px;display:none;gap:8px}
-    .tab-btn{border:1px solid var(--border);background:#fff;color:#000;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer}
-    .tab-btn[aria-selected="true"]{background:var(--ink);color:#fff;border-color:transparent}
-
-    .tabbar{position:fixed;bottom:0;left:0;right:0;height:56px;background:#ffffff;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;z-index:1000}
-    .tabbar button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:10px}
-    .tabbar button[aria-selected="true"]{background:#64e2d6}
-    .tabbar .lbl{font-size:18px;font-weight:700;color:#0b2f3b}
-
-    .tab-content{display:none;padding-bottom:72px}
-    .tab-content.is-active{display:block}
-
-    @media (min-width:861px){.tabbar{display:none}.tabs{display:flex}.tab-content{padding-bottom:20px}}
+    .footer{max-width:1100px;margin:20px auto 36px;padding:0 20px;text-align:center;color:#204855}
   </style>
 </head>
 <body>
-  <nav class="topbar">
-    <div class="brand">AD - Gerador de Prompt</div>
+  <nav class="topbar" role="navigation" aria-label="Menu principal">
+    <a class="brand" href="./">AD - Gerador de Prompt</a>
     <div class="right">
-      <a class="insta-link" href="https://www.instagram.com/osvaldosereiajr/" target="_blank" rel="noopener" aria-label="Abrir Instagram @osvaldosereiajr" title="@osvaldosereiajr">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <defs>
-            <linearGradient id="igGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f58529"/>
-              <stop offset="30%" stop-color="#feda77"/>
-              <stop offset="60%" stop-color="#dd2a7b"/>
-              <stop offset="80%" stop-color="#8134af"/>
-              <stop offset="100%" stop-color="#515bd4"/>
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="24" height="24" rx="6" fill="url(#igGrad)"/>
-          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4.5" fill="none" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="17.2" cy="6.8" r="1.3" fill="#ffffff"/>
+      <a class="icon-btn" href="./" aria-label="Gerador de Prompt" title="Gerador de Prompt">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 3l1.2 2.9L16 7.2l-2.8 1.3L12 11l-1.2-2.5L8 7.2l2.8-1.3L12 3z" stroke="#0b2f3b" stroke-width="1.3" fill="none"/>
+          <rect x="4.5" y="14.5" width="9" height="2.2" rx="1.1" transform="rotate(-45 4.5 14.5)" fill="#0b2f3b"/>
+          <circle cx="18.5" cy="5.8" r="1" fill="#0b2f3b"/>
+          <circle cx="20.2" cy="8.6" r=".7" fill="#0b2f3b"/>
+        </svg>
+      </a>
+      <a class="icon-btn" href="#" aria-label="Notícias" aria-current="page" title="Notícias">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3" y="4" width="14" height="16" rx="2" stroke="#0b2f3b" stroke-width="1.6"/>
+          <path d="M19 7v10a3 3 0 0 1-3 3H7" stroke="#0b2f3b" stroke-width="1.6"/>
+          <rect x="6" y="7" width="8" height="2.2" rx="1" fill="#0b2f3b"/>
+          <rect x="6" y="10.5" width="8" height="1.8" rx="0.9" fill="#0b2f3b" opacity=".8"/>
+          <rect x="6" y="13.5" width="6" height="1.8" rx="0.9" fill="#0b2f3b" opacity=".6"/>
+        </svg>
+      </a>
+      <a class="icon-btn" href="https://www.instagram.com/osvaldosereiajr/" target="_blank" rel="noopener" aria-label="Instagram @osvaldosereiajr" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" stroke="#0b2f3b" stroke-width="1.6"/>
+          <circle cx="12" cy="12" r="4.2" stroke="#0b2f3b" stroke-width="1.6"/>
+          <circle cx="17.5" cy="6.5" r="1.2" fill="#0b2f3b"/>
         </svg>
       </a>
     </div>
   </nav>
-  <header class="hero"><div id="quote" class="quote">—</div><div id="author" class="author"></div></header>
 
-  <nav class="tabs" role="tablist">
-    <button class="tab-btn" aria-selected="true" aria-controls="tab-gerador" id="tabbtn-gerador">Gerador</button>
-    <button class="tab-btn" aria-selected="false" aria-controls="tab-book" id="tabbtn-book">Arquivo</button>
-    <button class="tab-btn" aria-selected="false" aria-controls="tab-dicas" id="tabbtn-dicas">Dicas</button>
-  </nav>
+  <header class="hero">
+    <h1>Notícias jurídicas</h1>
+    <div class="sub">Atualizado até 3x ao dia via GitHub Actions.</div>
+  </header>
 
-  <section id="tab-gerador" class="tab-content is-active">
-    <main class="panel">
+  <main class="panel">
+    <div class="section">
       <div class="field-wrap">
-        <h3 class="label">Qual seu objetivo?</h3>
-        <select id="strategy" class="field">
-          <option value="explicacao">Explicação Básica</option>
-          <option value="resumo">Resumo Objetivo</option>
-          <option value="artigo">Análise Detalhada</option>
-          <option value="aplicacao">Aplicação Prática</option>
-          <option value="simulado">Exercícios/Testes</option>
-          <option value="faq">Perguntas Frequentes</option>
-          <option value="debate">Debate/Reflexão</option>
-          <option value="atualizacao">Contexto Atualizado</option>
-          <option value="plano">Plano de Estudo</option>
-          <option value="sustentacao">Apresentação em Sala</option>
-          <option value="jurisprudencia">Jurisprudência</option>
-        </select>
-      </div>
-      <div class="field-wrap">
-        <h3 class="label">Vamos falar sobre o quê?</h3>
-        <textarea id="theme" class="field" placeholder="Digite o tema"></textarea>
-      </div>
-      <div class="actions-out">
-        <div class="actions-buttons">
-          <button id="generate" class="btn btn-primary">Gerar</button>
-          <button id="copy" class="btn btn-copy">Copiar</button>
-          <button id="reset" class="btn btn-reset">Reiniciar</button>
+        <h2 class="label">Filtrar</h2>
+        <div class="news-controls">
+          <input id="q" class="field" type="search" placeholder="Filtrar por título..." />
+          <select id="source" class="field" style="min-width:220px">
+            <option value="">Todas as fontes</option>
+          </select>
+          <button id="refresh" class="btn btn-primary" type="button">Atualizar</button>
+          <span id="badge" style="margin-left:auto;font-weight:800;color:#08333e"></span>
         </div>
-        <textarea id="result" class="output" placeholder="Prompt gerado aqui..." readonly></textarea>
       </div>
-    </main>
-  </section>
 
-  <section id="tab-book" class="tab-content">
-    <main class="panel">
-      <h2 class="label">Arquivo – Suas últimas 500 gerações</h2>
-      <p class="field" style="min-height:0;margin-top:0">Carrega automaticamente de 10 em 10 enquanto você rola.</p>
-      <div id="book-list" class="book-list"></div>
-    </main>
-  </section>
+      <div id="list" class="grid" role="list"></div>
+    </div>
+  </main>
 
-  <section id="tab-dicas" class="tab-content">
-    <main class="panel">
-      <h2 class="label">Dicas de Uso — como cada objetivo gera a resposta</h2>
-      <div class="field" style="white-space:pre-wrap">
-<b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos-chave.
-
-<b>Resumo Objetivo</b> — conceito em 2 linhas, base legal, estrutura, diferenças, tendências, pegadinhas.
-
-<b>Análise Detalhada</b> — artigo acadêmico completo.
-
-<b>Aplicação Prática</b> — caso fictício + mini-modelo de peça.
-
-<b>Exercícios/Testes</b> — 5 questões comentadas.
-
-<b>FAQ</b> — 15 perguntas rápidas.
-
-<b>Debate/Reflexão</b> — argumentos pró e contra.
-
-<b>Contexto Atualizado</b> — panorama legislativo/jurisprudencial.
-
-<b>Plano de Estudo</b> — cronograma de 4 semanas.
-
-<b>Apresentação em Sala</b> — discurso de 4 min.
-
-<b>Jurisprudência (Radar)</b> — 15 itens verificados.
-      </div>
-    </main>
-  </section>
-
-  <div class="footer"></div>
-
-  <nav class="tabbar" role="tablist">
-    <button aria-selected="true" aria-controls="tab-gerador" id="m-tabbtn-gerador"><span class="lbl">Gerar</span></button>
-    <button aria-selected="false" aria-controls="tab-book" id="m-tabbtn-book"><span class="lbl">Arquivo</span></button>
-    <button aria-selected="false" aria-controls="tab-dicas" id="m-tabbtn-dicas"><span class="lbl">Dicas</span></button>
-  </nav>
+  <div class="footer">
+    <a href="https://www.instagram.com/osvaldosereiajr/" target="_blank" rel="noopener">@osvaldosereiajr</a>
+  </div>
 
   <script>
-    const QUOTES=['Não há liberdade sem lei. — Montesquieu','A justiça sem força é impotente; a força sem justiça é tirana. — Pascal'];
-    function loadRandomQuote(){const pick=QUOTES[Math.floor(Math.random()*QUOTES.length)];const parts=pick.split('—');document.getElementById('quote').textContent=(parts[0]||pick).trim();document.getElementById('author').textContent=parts[1]?'— '+parts[1].trim():'';}
-    loadRandomQuote();
+    const LIST = document.getElementById('list');
+    const BADGE = document.getElementById('badge');
+    const Q = document.getElementById('q');
+    const SOURCE = document.getElementById('source');
+    const REFRESH = document.getElementById('refresh');
 
-    const tabIds=['gerador','book','dicas'];
-    function activateTab(id){for(const t of tabIds){document.getElementById('tab-'+t).classList.toggle('is-active',t===id);document.getElementById('tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));document.getElementById('m-tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));}}
-    for(const t of tabIds){document.getElementById('tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));document.getElementById('m-tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));}
+    let ALL = [];
+    let FILTERED = [];
+    const PAGE_SIZE = 10;
+    let page = 0;
+    let loading = false;
+
+    async function loadNews(){
+      try{
+        const res = await fetch('./news.json?ts=' + Date.now(), { cache: 'no-store' });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        ALL = Array.isArray(data.items) ? data.items : [];
+        const sources = [...new Set(ALL.map(x=>x.source).filter(Boolean))].sort();
+        SOURCE.innerHTML = '<option value="">Todas as fontes</option>' + sources.map(s=>`<option>${s}</option>`).join('');
+        BADGE.textContent = `${ALL.length} itens • ${new Date(data.generatedAt).toLocaleString('pt-BR')}`;
+        applyFilters(true);
+      }catch(e){
+        BADGE.textContent = 'Erro ao carregar notícias';
+        LIST.innerHTML = '<div style="opacity:.8">Não foi possível carregar o news.json.</div>';
+      }
+    }
+
+    function applyFilters(reset){
+      const term = (Q.value||'').toLowerCase();
+      const src = SOURCE.value;
+      FILTERED = ALL.filter(x=>{
+        const okTerm = !term || (x.title||'').toLowerCase().includes(term);
+        const okSrc = !src || x.source === src;
+        return okTerm && okSrc;
+      });
+      if(reset){
+        page = 0;
+        LIST.innerHTML = '';
+      }
+      renderNext();
+    }
+
+    function renderNext(){
+      if(loading) return;
+      loading = true;
+      const start = page * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const slice = FILTERED.slice(start, end);
+      const html = slice.map(it=>{
+        const d = it.publishedAt ? new Date(it.publishedAt) : null;
+        const when = d ? d.toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'}) : '';
+        return `
+        <article class="card" role="listitem">
+          <div class="site">${it.source||'—'}</div>
+          <a class="title" href="${it.url}" target="_blank" rel="noopener">${escapeHtml(it.title||'(sem título)')}</a>
+          <div class="meta">${when}</div>
+        </article>`;
+      }).join('');
+      LIST.insertAdjacentHTML('beforeend', html);
+      page++;
+      loading = false;
+    }
+
+    function onScroll(){
+      const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200);
+      if(nearBottom && page * PAGE_SIZE < FILTERED.length){
+        renderNext();
+      }
+    }
+
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#039;' }[m])); }
+
+    Q.addEventListener('input', ()=>applyFilters(true));
+    SOURCE.addEventListener('change', ()=>applyFilters(true));
+    REFRESH.addEventListener('click', ()=>loadNews());
+    window.addEventListener('scroll', onScroll, {passive:true});
+
+    loadNews();
   </script>
 </body>
 </html>
