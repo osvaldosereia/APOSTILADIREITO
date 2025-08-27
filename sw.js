@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dl-v13';
+const CACHE_NAME = 'dl-hotfix-999';
 
 const ASSETS = [
   './',
