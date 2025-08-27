@@ -1,0 +1,397 @@
+<!-- =========================
+FILES: index.html, manifest.json, sw.js
+Copie cada bloco para o respectivo arquivo no seu GitHub Pages.
+Requisitos já existentes no seu repo: /icons/icon-192.png e /icons/icon-512.png
+========================= -->
+
+<!-- ========================= index.html ========================= -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#e8eff4" />
+  <title>direito.love — Chatbot (PWA sem GIF)</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" href="./icons/icon-192.png" />
+
+  <style>
+    :root{
+      --ink:#0b2f3b; --muted:#556b75; --bg:#ffffff; --soft:#f3f7f9; --panel:#e8eff4;
+      --brand:#0b3b4a; --brand-2:#63cfc1; --ok:#0b874a; --warn:#b45309;
+      --border:#d8e2e7; --shadow:0 10px 30px rgba(11,59,74,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{min-height:100%; display:flex; flex-direction:column; align-items:center}
+    .shell{width:100%; max-width:440px; min-height:100vh; background:var(--bg);}    
+    .topbar{position:sticky; top:0; z-index:10; background:#ffffffcc; backdrop-filter:saturate(140%) blur(8px); border-bottom:1px solid var(--border)}
+    .topbar .inner{margin:0 auto; max-width:440px; display:flex; align-items:center; justify-content:space-between; padding:10px 14px}
+    .logo{font-weight:800; letter-spacing:.3px}
+    .logo b{background:linear-gradient(90deg,var(--brand),var(--brand-2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .ig a{font-size:13px; color:var(--muted); text-decoration:none}
+
+    .chat{padding:14px; display:flex; flex-direction:column; gap:10px}
+    .msg{max-width:85%; padding:10px 12px; border-radius:14px; box-shadow:var(--shadow)}
+    .bot{align-self:flex-start; background:var(--panel)}
+    .user{align-self:flex-end; background:var(--soft)}
+    .msg small{display:block; font-size:11px; color:var(--muted); margin-top:6px}
+
+    /* Indicador de digitação SEM GIF: usa ícone de teclado */
+    .thinking{display:none; align-self:flex-start; background:var(--panel); padding:10px 12px; border-radius:14px; box-shadow:var(--shadow); gap:8px; align-items:center}
+    .thinking.show{display:inline-flex}
+    .kbd{width:18px; height:18px; display:inline-block}
+
+    .card{background:var(--soft); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow)}
+    .options{display:grid; gap:8px; padding:10px}
+    .opt{padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer; transition:transform .06s ease, box-shadow .2s}
+    .opt:hover{transform:translateY(-1px)}
+    .opt strong{display:block}
+    .opt span{display:block; font-size:12px; color:var(--muted)}
+
+    .form{display:grid; gap:8px; padding:12px}
+    .row{display:grid; gap:6px}
+    label{font-size:12px; color:var(--muted)}
+    input, select, textarea{width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:12px; font:inherit; outline:none}
+
+    .actions{display:flex; gap:8px; padding:10px; flex-wrap:wrap}
+    .btn{appearance:none; border:none; border-radius:12px; padding:10px 14px; font-weight:600; cursor:pointer}
+    .btn.primary{background:var(--brand); color:#fff}
+    .btn.ghost{background:#fff; color:var(--brand); border:1px solid var(--border)}
+    .btn.muted{background:#fff; color:#334; border:1px dashed var(--border)}
+
+    .prompt{white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#0b2f3b0a; border:1px solid var(--border); border-radius:14px; padding:12px; line-height:1.4}
+
+    .toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(20px); opacity:0; background:#0b3b4a; color:#fff; padding:10px 14px; border-radius:12px; box-shadow:var(--shadow); transition:.25s; z-index:100}
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+    .install-banner{position:fixed; bottom:16px; left:50%; transform:translateX(-50%); display:none; gap:8px; align-items:center; background:#ffffff; border:1px solid var(--border); box-shadow:var(--shadow); border-radius:12px; padding:8px 10px; z-index:200}
+    .install-banner.show{display:flex}
+    .install-banner button{border:none; border-radius:10px; padding:8px 10px; font-weight:600; cursor:pointer}
+    .install-banner .go{background:var(--brand); color:#fff}
+    .install-banner .close{background:#fff; border:1px solid var(--border); color:#334}
+
+    .foot{padding:24px 14px; color:var(--muted); font-size:12px}
+    @media (max-width:480px){.shell,.topbar .inner{max-width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="shell">
+      <header class="topbar">
+        <div class="inner">
+          <div class="logo">direito<b>.love</b></div>
+          <div class="ig"><a href="https://instagram.com/osvaldosereiajr" target="_blank" rel="noopener">@osvaldosereiajr</a></div>
+        </div>
+      </header>
+
+      <main class="chat" id="chat" aria-live="polite"></main>
+
+      <div class="foot" aria-hidden="true">
+        <div>Versão leve, PWA ativo, sem GIF (ícones apenas). Cache controlado no sw.js.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copiado!</div>
+  <div class="install-banner" id="installBanner">
+    <span>Instalar app?</span>
+    <button class="go" id="btnInstall">Instalar</button>
+    <button class="close" id="btnInstallClose">Fechar</button>
+  </div>
+
+  <template id="svgKbd">
+    <!-- Ícone de teclado simples (SVG leve) -->
+    <svg viewBox="0 0 24 24" class="kbd" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="5" width="20" height="14" rx="3" ry="3" fill="#0b3b4a10" stroke="#7aa3b1"/>
+      <rect x="4" y="8" width="2" height="2" rx=".5" fill="#7aa3b1"/>
+      <rect x="7" y="8" width="2" height="2" rx=".5" fill="#7aa3b1"/>
+      <rect x="10" y="8" width="2" height="2" rx=".5" fill="#7aa3b1"/>
+      <rect x="13" y="8" width="2" height="2" rx=".5" fill="#7aa3b1"/>
+      <rect x="16" y="8" width="2" height="2" rx=".5" fill="#7aa3b1"/>
+      <rect x="4" y="11" width="8" height="2" rx=".6" fill="#7aa3b1"/>
+      <rect x="13" y="11" width="5" height="2" rx=".6" fill="#7aa3b1"/>
+      <rect x="4" y="14" width="14" height="2" rx=".6" fill="#7aa3b1"/>
+    </svg>
+  </template>
+
+  <script>
+    // ----- PWA: registra SW -----
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+
+    // ----- Instalação (beforeinstallprompt) -----
+    let deferredPrompt;
+    const installBanner = document.getElementById('installBanner');
+    const btnInstall = document.getElementById('btnInstall');
+    const btnInstallClose = document.getElementById('btnInstallClose');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBanner.classList.add('show');
+    });
+
+    btnInstall?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBanner.classList.remove('show');
+      console.log('instalação:', outcome);
+    });
+    btnInstallClose?.addEventListener('click', ()=> installBanner.classList.remove('show'));
+
+    // ----- App Chat -----
+    const chat = document.getElementById('chat');
+    const toast = document.getElementById('toast');
+
+    const frasesVibe = [
+      'Se você está aqui é porque quer dominar o tema. Bora nessa.',
+      'Busca de conhecimento detectada. E isso já te coloca à frente.',
+      'Aprender Direito com método é metade do caminho. A outra metade a gente faz agora.',
+      'Quem estuda com estratégia erra menos e acerta mais. Vamos ajustar a mira.',
+      'Você trouxe o tema, eu trago a estrutura. Time que vence.',
+      'Sem enrolação: objetivo claro, resposta direta. Partiu.',
+      'O jogo muda quando o estudo vira hábito. Vamos ligar o modo prático.',
+      'Prompts bons geram estudos bons. Vamos criar os seus.',
+      'Você estuda. Eu organizo. A prova agradece.',
+      'Simplicidade, precisão e aplicabilidade. É assim que a gente vai.'
+    ];
+
+    const sauda = () => {
+      const d = new Date();
+      const h = d.getHours();
+      const dia = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'][d.getDay()];
+      const bom = h < 12 ? 'Bom dia' : (h < 18 ? 'Boa tarde' : 'Boa noite');
+      return `${bom}! Feliz ${dia}.`;
+    };
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    function el(tag, cls, html){
+      const e = document.createElement(tag);
+      if(cls) e.className = cls;
+      if(html) e.innerHTML = html;
+      return e;
+    }
+
+    function thinking(show){
+      let t = document.querySelector('.thinking');
+      if (show){
+        if(!t){
+          t = el('div','thinking');
+          const icon = document.getElementById('svgKbd').content.cloneNode(true);
+          const txt = el('span','', 'Gerando…');
+          t.append(icon, txt);
+          chat.appendChild(t);
+        }
+        t.classList.add('show');
+        scrollBottom();
+      } else if(t){
+        t.classList.remove('show');
+      }
+    }
+
+    function scrollBottom(){
+      requestAnimationFrame(()=> window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}));
+    }
+
+    function addBot(text){
+      const m = el('div','msg bot');
+      m.innerHTML = text;
+      chat.appendChild(m);
+      scrollBottom();
+      return m;
+    }
+    function addUser(text){
+      const m = el('div','msg user');
+      m.textContent = text;
+      chat.appendChild(m);
+      scrollBottom();
+      return m;
+    }
+
+    function option(label, hint, onClick){
+      const o = el('button','opt');
+      o.innerHTML = `<strong>${label}</strong><span>${hint}</span>`;
+      o.addEventListener('click', onClick);
+      return o;
+    }
+
+    function toastShow(msg){
+      toast.textContent = msg; toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'), 1600);
+    }
+
+    // Estratégias
+    const ESTRATEGIAS = [
+      {
+        id:'entender',
+        label:'AGORA EU APRENDO',
+        hint:'Explicação clara, QUADROS e exemplos práticos.',
+        build:(tema)=>`Você é um tutor de Direito para iniciantes. Linguagem simples, objetiva e sem metáforas.\n\nObjetivo: explicar **${tema}** de forma clara e aplicável.\n\nRegras:\n- Frases curtas. Sem jargão desnecessário.\n- Sempre que possível, use listas, passos numerados e QUADROS/TABELAS comparativas.\n- Se o tema tiver aspecto processual, inclua: legitimidade, competência, prazos, rito e recursos.\n- Estilo humanizado: acolhedor, direto e sem floreios.\n\nFormato (Markdown):\n# Conceito em até 4 linhas\n# Base legal essencial (artigos/leis)\n# Quadro comparativo (tabela): Instituto | Quando se aplica | Exemplo rápido\n# Passo a passo de raciocínio (4–6 passos práticos)\n# Exemplos práticos (3 mini-casos resolvidos)\n# Erros comuns (3) e Pegadinhas de prova (2)\n# Checklist de prova (5 itens objetivos)\n# Mini glossário (5 termos-chave)`
+      },
+      {
+        id:'treinar',
+        label:'VAMOS TREINAR',
+        hint:'Questões estilo OAB + comentário didático.',
+        build:(tema)=>`Você é um examinador da OAB. Linguagem objetiva, estilo prova.\n\nTarefa: Crie 5 questões sobre **${tema}** (2 fáceis, 2 médias, 1 difícil).\nFormato: múltipla escolha ou discursiva curta, com gabarito e comentário didático.\n\nRegras:\n- Enunciados claros, sem pegadinhas artificiais.\n- Comentário mostra por que cada alternativa está certa/errada.\n- Estilo humanizado: direto e encorajador.`
+      },
+      {
+        id:'raiox',
+        label:'RAIO-X ATUALIZAÇÃO',
+        hint:'Panorama de entendimentos + links de notícias/artigos.',
+        build:(tema)=>`Você é um jurista pesquisador. Linguagem clara e técnica na medida.\n\nTarefa: Mostrar como **${tema}** vem sendo tratado na atualidade pela justiça e pela doutrina.\n\nRegras:\n- Sem citar acórdãos específicos; Súmulas podem ser citadas.\n- Pesquise e linke *apenas* notícias jurídicas e artigos acadêmicos/universitários (evite sites de governo exceto Planalto e JusBrasil).\n- Entregue com SUMÁRIO e libere 1 capítulo por vez, pedindo autorização para continuar.\n- Estilo humanizado e objetivo.\n\nEstrutura de cada capítulo:\n1) Tese/entendimento predominante (2–3 linhas).\n2) Ponto de atenção prático (advocacia/estudo).\n3) 2–3 fontes com links.`
+      }
+    ];
+
+    // UI Inicial
+    async function init(){
+      addBot(`<b>${sauda()}</b><br>${frasesVibe[Math.floor(Math.random()*frasesVibe.length)]}`);
+      await sleep(800);
+      addBot('Qual o objetivo do prompt que você quer que eu crie?');
+      const box = el('div','card options');
+      ESTRATEGIAS.forEach(s => box.appendChild(option(s.label, s.hint, ()=> escolher(s))));
+      chat.appendChild(box);
+      scrollBottom();
+    }
+
+    async function escolher(estr){
+      addUser(estr.label);
+      await sleep(600);
+      addBot('Perfeito. Diga o <b>tema</b> em 3–6 palavras.');
+      const form = el('div','card form');
+      form.innerHTML = `
+        <div class="row">
+          <label for="tema">Tema</label>
+          <input id="tema" placeholder="ex.: Dano moral por atraso de voo" autocomplete="off" />
+        </div>
+        <div class="row">
+          <label for="tom">Tom da resposta</label>
+          <select id="tom">
+            <option>Direto e didático</option>
+            <option>Professor universitário</option>
+            <option>Mentor de estudos</option>
+            <option>Coach encorajador</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="gerar">Gerar prompt</button>
+          <button class="btn ghost" id="cancelar">Reiniciar</button>
+        </div>`;
+      chat.appendChild(form);
+      scrollBottom();
+
+      form.querySelector('#cancelar').addEventListener('click', ()=> location.reload());
+      form.querySelector('#gerar').addEventListener('click', async ()=>{
+        const tema = form.querySelector('#tema').value.trim();
+        const tom = form.querySelector('#tom').value;
+        if(!tema){ toastShow('Digite um tema.'); return; }
+        addUser(`Tema: ${tema}`);
+
+        // Mostra "pensando" com ícone após 2s
+        await sleep(2000);
+        thinking(true);
+        await sleep(1200);
+
+        const prompt = `${estr.build(tema)}\n\nTom sugerido: ${tom}.`;
+        thinking(false);
+
+        const box = el('div','card');
+        box.style.padding = '10px';
+        const pre = el('pre','prompt');
+        pre.textContent = prompt;
+        const actions = el('div','actions');
+        const bCopy = el('button','btn primary','Copiar');
+        const bReset = el('button','btn muted','Reiniciar');
+        actions.append(bCopy,bReset);
+        box.append(pre, actions);
+        chat.appendChild(box);
+        scrollBottom();
+
+        bCopy.addEventListener('click', async ()=>{
+          try{ await navigator.clipboard.writeText(prompt); toastShow('Prompt copiado!'); }
+          catch(e){ console.error(e); toastShow('Falha ao copiar'); }
+        });
+        bReset.addEventListener('click', ()=> location.reload());
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
+
+<!-- ========================= manifest.json ========================= -->
+{
+  "name": "direito.love — Chatbot (sem GIF)",
+  "short_name": "direito.love",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e8eff4",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+
+
+<!-- ========================= sw.js ========================= -->
+// Versão do cache — altere a cada deploy para evitar versão antiga
+const CACHE = 'ad-chatbot-v3';
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
+];
+
+self.addEventListener('install', (e)=>{
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
+});
+
+self.addEventListener('activate', (e)=>{
+  e.waitUntil(
+    caches.keys().then(keys=>Promise.all(keys.map(k=> k!==CACHE && caches.delete(k))))
+  );
+  self.clients.claim();
+});
+
+// Estratégia: Network-first para HTML, Cache-first para estáticos
+self.addEventListener('fetch', (e)=>{
+  const url = new URL(e.request.url);
+  if (e.request.mode === 'navigate' || (e.request.destination === 'document')){
+    e.respondWith(
+      fetch(e.request).then(res=>{
+        const copy = res.clone();
+        caches.open(CACHE).then(c=> c.put('/index.html', copy));
+        return res;
+      }).catch(()=> caches.match('/index.html'))
+    );
+    return;
+  }
+  if (url.pathname.startsWith('/icons/') || url.pathname.endsWith('manifest.json')){
+    e.respondWith(
+      caches.match(e.request).then(cached=> cached || fetch(e.request).then(res=>{
+        const copy = res.clone();
+        caches.open(CACHE).then(c=> c.put(e.request, copy));
+        return res;
+      }))
+    );
+  }
+});
