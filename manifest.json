@@ -1,7 +1,7 @@
 {
   "name": "direito.love — Chatbot (sem GIF)",
   "short_name": "direito.love",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=7",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
