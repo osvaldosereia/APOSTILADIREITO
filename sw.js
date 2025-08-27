@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dl-v1';
+const CACHE_NAME = 'dl-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -6,11 +6,9 @@ const ASSETS = [
   './app.js',
   './manifest.json',
   './frases.txt',
-  './kb/meta.json',
-  './kb/prompts/aprender.json',
-  './kb/prompts/treinar.json',
-  './kb/prompts/raiox.json',
-  './kb/snippets/civil.json'
+  './kb/aprender.txt',
+  './kb/treinar.txt',
+  './kb/raiox.txt'
 ];
 
 self.addEventListener('install', (e)=>{
