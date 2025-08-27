@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dl-v8';
+const CACHE_NAME = 'dl-v13';
 
 const ASSETS = [
   './',
