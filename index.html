@@ -1,153 +1,62 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>direito.love — Fase 4/5 (GIF + Copiar)</title>
-  <style>
-    :root{ --ink:#0b2f3b; --line:#e2edf0; --brand:#62bcb1 }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
-    .wrap{max-width:520px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
-    .log{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto}
-    .row{display:flex;margin:10px 0}
-    .row.me{justify-content:flex-end}
-    .bubble{background:#f3f7fb;border-radius:14px;padding:10px 12px;max-width:100%;line-height:1.55}
-    .me .bubble{background:#7aa2b7;color:#fff}
-    .chips{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
-    .chip{padding:10px 14px;border:1px solid var(--line);border-radius:999px;text-align:center;cursor:pointer;width:max-content;margin:0 auto}
-    .composer{display:flex;flex-direction:column;gap:8px}
-    textarea{min-height:64px;border:1px solid var(--line);border-radius:10px;padding:10px}
-    .actions{display:flex;flex-direction:column;gap:8px;align-items:center}
-    .btn{border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:#fff;font-size:13px;cursor:pointer}
-    .btn.primary{background:var(--brand);color:#083139;border:0}
-    .btn.ghost{background:#fff;border:1px solid var(--line)}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b3b4a" />
+<title>direito.love — Simulador de Chat</title>
 
-    .typing{display:inline-flex;gap:6px;align-items:center}
-    .dot{width:6px;height:6px;border-radius:999px;background:#8aa6b3;animation:blink 1s infinite}
-    .dot:nth-child(2){animation-delay:.15s}
-    .dot:nth-child(3){animation-delay:.3s}
-    @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-    .stickerWrap{display:flex;justify-content:center;margin:12px 0}
-    .sticker{width:180px;height:180px;border-radius:16px;overflow:hidden;}
-    .sticker img{width:100%;height:100%;object-fit:cover}
-  </style>
+<!-- Manifest & PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+
+<!-- Favicon inline (SVG) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230b3b4a'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='34' fill='white' font-family='Inter,Arial,sans-serif'>dl</text></svg>">
+
+
+<link rel="preload" href="./styles.css" as="style">
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <main class="wrap">
-    <div id="log" class="log" aria-live="polite"></div>
-    <div class="composer">
-      <label for="tema">Tema</label>
-      <textarea id="tema" placeholder="Digite o tema…"></textarea>
-      <div class="actions">
-        <button id="btnEnviar" class="btn primary">Enviar</button>
-        <button id="btnNova" class="btn">Nova pesquisa</button>
-      </div>
-    </div>
-  </main>
-  <script>
-    (function(){
-      const log=document.getElementById('log');
-      const tema=document.getElementById('tema');
-      const btnEnviar=document.getElementById('btnEnviar');
-      const btnNova=document.getElementById('btnNova');
+<header class="topbar" role="banner">
+<div class="topbar__inner">
+<div class="brand" aria-label="direito.love">
+<!-- Logo inline SVG -->
+<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M12 21s-6-4.35-6-9a6 6 0 1 1 12 0c0 4.65-6 9-6 9z" fill="#e63946"/>
+</svg>
+<span class="brand__text">direito.love</span>
+</div>
+<a class="brand__insta" href="https://instagram.com/osvaldosereiajr" target="_blank" rel="noopener">@osvaldosereiajr</a>
+</div>
+</header>
 
-      const pick=a=>a[Math.floor(Math.random()*a.length)];
-      const pause={greet:()=>2200+Math.random()*1200,confirm:()=>1800+Math.random()*800};
-      const VARS={
-        greet1:[
-          'Olá, tudo bem por aí? Espero que seu dia esteja sendo leve e produtivo. ✨',
-          'Oi! Que bom te ver por aqui. Pronto(a) pra mais uma rodada de estudos?',
-          'E aí, como você está hoje? Bora aprender juntos com calma e foco?'
-        ],
-        askGoal:['Me conta: qual é o foco agora?','Qual destes objetivos combina mais com você hoje?','Pra começar bem, escolha um objetivo 👇'],
-        askTema:['Perfeito 🙌 Agora me diga qual é o tema que você gostaria de trabalhar.','Show! Qual assunto você quer explorar hoje?','Maravilha! Digite em uma linha o tema que precisa estudar.'],
-        received:['Recebi o seu tema 👌 Vou preparar o prompt com carinho…','Show, já anotei. Estou estruturando um prompt caprichado pra você…','Legal! Entendi o tema e já estou montando a melhor versão pra te ajudar.'],
-        celebrate:['Uhul! 🚀 Seu prompt ficou pronto e está excelente.','Prontinho! ✨ Estruturei com cuidado, agora é só copiar e usar.','Tudo certo 🙌 Seu prompt está finalizado e no ponto.'],
-        restart:['Vamos lá para uma nova pesquisa! 🔄','Recomeçando com gás! Escolha o novo objetivo 👇','Nova pesquisa chegando, manda ver no objetivo! ✨']
-      };
 
-      function bubble(html,who){const r=document.createElement('div');r.className='row '+(who||'bot');const b=document.createElement('div');b.className='bubble';b.innerHTML=html;r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;return r;}
-      function typing(){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="bubble"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div>';log.appendChild(r);log.scrollTop=log.scrollHeight;return{remove:()=>r.remove()};}
-      async function say(html,kind='confirm'){const t=typing();await new Promise(r=>setTimeout(r,pause[kind]()));t.remove();bubble(html,'bot');}
+<main id="app" class="app" role="main">
+<section id="chat" class="chat" aria-live="polite" aria-label="Conversas"></section>
 
-      async function greet(){
-        bubble(pick(VARS.greet1),'bot');
-        await say(pick(VARS.askGoal),'greet');
-        setTimeout(()=>{
-          const r=document.createElement('div');r.className='row bot';
-          const b=document.createElement('div');b.className='bubble';
-          const wrap=document.createElement('div');wrap.className='chips';
-          ['ENTENDER','TREINAR','PESQUISAR'].forEach(l=>{const c=document.createElement('div');c.className='chip';c.textContent=l;c.onclick=()=>onGoal(l);wrap.appendChild(c)});
-          b.appendChild(wrap);r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;
-        },600);
-      }
 
-      function onGoal(goal){
-        bubble(`Legal! Vamos seguir com <b>${goal}</b>.`,'bot');
-        setTimeout(()=>bubble(pick(VARS.askTema),'bot'),500);
-        tema.focus();
-      }
+<div id="composer" class="composer" role="region" aria-label="Área de escrita">
+<!-- O composer é gerenciado dinamicamente pelo app.js -->
+</div>
+</main>
 
-      async function onSend(){
-        const t=(tema.value||'').trim();
-        if(!t){await say('Antes de tudo, me diga qual é o <b>tema</b> 😉','confirm');return;}
-        bubble(t,'me');tema.value='';
-        await say(pick(VARS.received),'confirm');
-        await new Promise(r=>setTimeout(r,3000));
-        const r=document.createElement('div');r.className='row bot';
-        const b=document.createElement('div');b.className='bubble';
-        const wrap=document.createElement('div');wrap.className='stickerWrap';
-        const box=document.createElement('div');box.className='sticker';
-        const gifs=[
-          'https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif', // confete
-          'https://media.giphy.com/media/9J7tdYltWyXIY/giphy.gif',      // foguete
-          'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif',     // check/ok
-          'https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif',  // palmas
-          'https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif',      // brilho/celebração
-          'https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif', // vitória/troféu
-          'https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif', // dança
-          'https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif'       // nerd/ok
-        ];
-        const img=document.createElement('img');
-        img.src=pick(gifs);
-        img.decoding='async';
-        img.loading='lazy';
-        img.alt='Celebrando prompt criado';
-        box.appendChild(img);
-        wrap.appendChild(box);b.appendChild(wrap);r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;
-        await new Promise(r=>setTimeout(r,1800));
-        await say(pick(VARS.celebrate),'confirm');
-        const rowBtns=bubble('', 'bot');
-        const wrapBtns=document.createElement('div');wrapBtns.className='actions';
-        wrapBtns.appendChild(mkCopyBtn('Copiar p/ ChatGPT','Prompt simulado para ChatGPT'));
-        wrapBtns.appendChild(mkCopyBtn('Copiar p/ Gemini','Prompt simulado para Gemini'));
-        wrapBtns.appendChild(mkCopyBtn('Copiar p/ Perplexity','Prompt simulado para Perplexity'));
-        rowBtns.querySelector('.bubble').appendChild(wrapBtns);
-        const ref=bubble(pick(VARS.restart),'bot');
-        const wrapRef=document.createElement('div');wrapRef.className='chips';
-        const novo=document.createElement('div');novo.className='chip';novo.textContent='Nova pesquisa';novo.onclick=startFresh;wrapRef.appendChild(novo);
-        ref.querySelector('.bubble').appendChild(wrapRef);
-      }
 
-      function mkCopyBtn(label,text){const b=document.createElement('button');b.className='btn ghost';b.textContent=label;b.onclick=()=>copyText(text,b);return b;}
-      function copyText(text,btn){if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>flash(btn)).catch(()=>fallback(text,btn));}else{fallback(text,btn);}}
-      function fallback(text,btn){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch{}document.body.removeChild(ta);flash(btn);}
-      function flash(btn){const old=btn.textContent;btn.textContent='Copiado!';setTimeout(()=>btn.textContent=old,1200);}
+<!-- Banner de instalação (Android) / Instrução (iOS) -->
+<div id="installBanner" class="install-banner hidden" aria-live="polite">
+<div class="install-banner__content">
+<span id="installText">Instale o app para acesso rápido.</span>
+<div class="install-banner__actions">
+<button id="installBtn" class="btn btn--primary">Instalar</button>
+<button id="installClose" class="btn btn--ghost" aria-label="Fechar">Fechar</button>
+</div>
+</div>
+</div>
 
-      function startFresh(){log.innerHTML='';tema.value='';greet();}
 
-      // ligar botões e envio
-      btnEnviar.addEventListener('click', onSend);
-      btnNova.addEventListener('click', startFresh);
-      tema.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();onSend();}});
-
-      let __booted=false;function safeStart(){if(__booted)return;__booted=true;startFresh();}
-      document.addEventListener('DOMContentLoaded',safeStart);
-      window.addEventListener('load',safeStart);
-      setTimeout(safeStart,0);
-    })();
-  </script>
+<script defer src="./app.js"></script>
 </body>
 </html>
