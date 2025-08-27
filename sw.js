@@ -1,12 +1,11 @@
-// PWA service worker — versão sem GIF
-// DICA: troque o sufixo do CACHE a cada deploy para forçar atualização
-const CACHE = 'ad-chatbot-v3';
+// PWA service worker — sem GIF — v4
+const CACHE = 'ad-chatbot-v4';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
@@ -21,30 +20,29 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Network-first para HTML (navegação) e cache-first para estáticos
+// Network-first para HTML; cache-first para estáticos
 self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
+  const req = e.request;
+  const url = new URL(req.url);
 
-  // Navegação (documentos/HTML)
-  if (e.request.mode === 'navigate' || e.request.destination === 'document') {
+  if (req.mode === 'navigate' || req.destination === 'document') {
     e.respondWith(
-      fetch(e.request).then(res => {
+      fetch(req).then(res => {
         const copy = res.clone();
-        caches.open(CACHE).then(c => c.put('/index.html', copy));
+        caches.open(CACHE).then(c => c.put('./index.html', copy));
         return res;
-      }).catch(() => caches.match('/index.html'))
+      }).catch(() => caches.match('./index.html'))
     );
     return;
   }
 
-  // Estáticos (ícones/manifest)
-  if (url.pathname.startsWith('/icons/') || url.pathname.endsWith('manifest.json')) {
+  // Ícones e manifest
+  if (url.pathname.endsWith('manifest.json') || url.pathname.includes('/icons/')) {
     e.respondWith(
-      caches.match(e.request).then(cached =>
-        cached ||
-        fetch(e.request).then(res => {
+      caches.match(req).then(cached =>
+        cached || fetch(req).then(res => {
           const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy));
+          caches.open(CACHE).then(c => c.put(req, copy));
           return res;
         })
       )
