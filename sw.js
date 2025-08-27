@@ -21,12 +21,9 @@ const ASSETS = [
   './icons/thinking1.gif',
   './icons/thinking2.gif',
   './icons/thinking3.gif',
-  './icons/thinking4.gif',
-  './icons/thinking5.gif',
   './icons/thinking6.gif',
   './icons/thinking7.gif',
   './icons/thinking8.gif',
-  './icons/thinking9.gif',
   './icons/thinking10.gif'
 ];
 
