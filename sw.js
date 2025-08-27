@@ -1,9 +1,9 @@
-// PWA service worker — sem GIF — v4
-const CACHE = 'ad-chatbot-v4';
+// PWA service worker — sem GIF — v7
+const CACHE = 'ad-chatbot-v7';
 const ASSETS = [
   './',
-  './index.html',
-  './manifest.json',
+  './index.html?v=7',
+  './manifest.json?v=7',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
@@ -20,7 +20,7 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Network-first para HTML; cache-first para estáticos
+// Network-first p/ HTML; cache-first p/ estáticos
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
@@ -29,15 +29,27 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(req).then(res => {
         const copy = res.clone();
-        caches.open(CACHE).then(c => c.put('./index.html', copy));
+        caches.open(CACHE).then(c => c.put('./index.html?v=7', copy));
         return res;
-      }).catch(() => caches.match('./index.html'))
+      }).catch(() => caches.match('./index.html?v=7'))
     );
     return;
   }
 
-  // Ícones e manifest
-  if (url.pathname.endsWith('manifest.json') || url.pathname.includes('/icons/')) {
+  if (url.pathname.endsWith('/manifest.json') || url.search.includes('v=7')) {
+    e.respondWith(
+      caches.match(req).then(cached =>
+        cached || fetch(req).then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy));
+          return res;
+        })
+      )
+    );
+    return;
+  }
+
+  if (url.pathname.includes('/icons/')) {
     e.respondWith(
       caches.match(req).then(cached =>
         cached || fetch(req).then(res => {
