@@ -3,565 +3,151 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a3a4a" />
-  <title>AD - Gerador de Prompt</title>
+  <title>direito.love — Fase 4/5 (GIF + Copiar)</title>
   <style>
-    :root{
-      --ink:#0b2f3b;
-      --bg:#ffffff;
-      --panel:#63cfc1;
-      --panel-2:#e9f2f5;
-      --btn:#0b3b4a;
-      --btn-copy:#6b7785;
-      --btn-reset:#4b5563;
-      --border:#d8e2e7;
-      --topbar:#63d1c3; /* NOVO: cor do menu fixo no topo */
-    }
+    :root{ --ink:#0b2f3b; --line:#e2edf0; --brand:#62bcb1 }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;background:var(--bg);color:var(--ink);padding-top:64px}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:#fff}
+    .wrap{max-width:520px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
+    .log{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;overflow:auto}
+    .row{display:flex;margin:10px 0}
+    .row.me{justify-content:flex-end}
+    .bubble{background:#f3f7fb;border-radius:14px;padding:10px 12px;max-width:100%;line-height:1.55}
+    .me .bubble{background:#7aa2b7;color:#fff}
+    .chips{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+    .chip{padding:10px 14px;border:1px solid var(--line);border-radius:999px;text-align:center;cursor:pointer;width:max-content;margin:0 auto}
+    .composer{display:flex;flex-direction:column;gap:8px}
+    textarea{min-height:64px;border:1px solid var(--line);border-radius:10px;padding:10px}
+    .actions{display:flex;flex-direction:column;gap:8px;align-items:center}
+    .btn{border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:#fff;font-size:13px;cursor:pointer}
+    .btn.primary{background:var(--brand);color:#083139;border:0}
+    .btn.ghost{background:#fff;border:1px solid var(--line)}
 
-    /* Topbar atualizada */
-    .topbar{
-      position:fixed;top:0;left:0;right:0;height:64px;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 18px;background:var(--topbar);z-index:1000;
-      border-bottom:1px solid var(--border)
-    }
-    .topbar .brand{font-weight:900;letter-spacing:.2px;color:var(--ink)}
-    .topbar .right{display:flex;align-items:center;gap:12px}
+    .typing{display:inline-flex;gap:6px;align-items:center}
+    .dot{width:6px;height:6px;border-radius:999px;background:#8aa6b3;animation:blink 1s infinite}
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-    /* Botão/ícone Instagram */
-    .insta-link{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:28px;height:28px;border-radius:6px;text-decoration:none;
-      transition:transform .12s ease;
-    }
-    .insta-link:hover{transform:translateY(-1px)}
-    .insta-link svg{display:block;width:100%;height:100%}
-
-    .hero{display:grid;gap:8px;max-width:960px;margin:0 auto;padding:40px 20px 24px;align-items:start}
-    .quote{font-weight:800;line-height:1.05;color:var(--ink);font-size:clamp(28px,6vw,64px)}
-    .author{font-style:italic;font-size:clamp(14px,2.2vw,22px);opacity:.85}
-
-    .panel{background:var(--panel);border-radius:32px;padding:24px;max-width:960px;margin:0 auto}
-    @media (min-width:861px){.panel{padding:32px;box-shadow:0 10px 28px rgba(0,0,0,.06)}}
-
-    .field-wrap{margin:16px 0 20px}
-    .label{font-weight:900;font-size:clamp(16px,2.6vw,26px);color:#08333e;margin:0 0 12px}
-    .field{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:18px;padding:16px;color:#11323c;outline:none}
-    textarea.field{min-height:120px;resize:vertical}
-
-    .actions-out{display:flex;flex-direction:column;gap:14px}
-    .actions-buttons{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{border:none;border-radius:999px;padding:10px 18px;font-weight:800;letter-spacing:.3px;color:#fff;cursor:pointer}
-    .btn-primary{background:var(--btn)}
-    .btn-copy{background:var(--btn-copy);font-size:14px;padding:8px 14px}
-    .btn-reset{background:var(--btn-reset)}
-
-    .output{background:var(--panel-2);border:1px solid var(--border);border-radius:18px;min-height:160px;padding:16px;color:#16333b;width:100%;resize:vertical}
-
-    /* Book */
-    .chipbtn{border:1px solid var(--border);background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:13px}
-    .chipbtn:active{transform:translateY(1px)}
-    .book-list{max-height:60vh;overflow:auto;border:1px solid var(--border);border-radius:16px;background:#fff}
-    .book-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border)}
-    .book-item:last-child{border-bottom:none}
-    .book-meta{min-width:220px;max-width:calc(100% - 120px)}
-    .book-obj{font-weight:800;color:#08333e}
-    .book-tema{opacity:.9;margin-top:4px;font-size:14px}
-
-    .tabs{max-width:960px;margin:16px auto;padding:0 20px;display:none;gap:8px}
-    .tab-btn{border:1px solid var(--border);background:#fff;color:#000;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer}
-    .tab-btn[aria-selected="true"]{background:var(--ink);color:#fff;border-color:transparent}
-
-    .tabbar{position:fixed;bottom:0;left:0;right:0;height:56px;background:#ffffff;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;z-index:1000}
-    .tabbar button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:10px}
-    .tabbar button[aria-selected="true"]{background:#64e2d6}
-    .tabbar .lbl{font-size:18px;font-weight:700;color:#0b2f3b}
-
-    .tab-content{display:none;padding-bottom:72px}
-    .tab-content.is-active{display:block}
-
-    @media (min-width:861px){.tabbar{display:none}.tabs{display:flex}.tab-content{padding-bottom:20px}}
+    .stickerWrap{display:flex;justify-content:center;margin:12px 0}
+    .sticker{width:180px;height:180px;border-radius:16px;overflow:hidden;}
+    .sticker img{width:100%;height:100%;object-fit:cover}
   </style>
 </head>
 <body>
-  <!-- Topbar com Instagram à direita -->
-  <nav class="topbar">
-    <div class="brand">AD - Gerador de Prompt</div>
-    <div class="right">
-      <a class="insta-link" href="https://www.instagram.com/osvaldosereiajr/" target="_blank" rel="noopener" aria-label="Abrir Instagram @osvaldosereiajr" title="@osvaldosereiajr">
-        <!-- SVG Instagram colorido -->
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <defs>
-            <linearGradient id="igGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f58529"/>
-              <stop offset="30%" stop-color="#feda77"/>
-              <stop offset="60%" stop-color="#dd2a7b"/>
-              <stop offset="80%" stop-color="#8134af"/>
-              <stop offset="100%" stop-color="#515bd4"/>
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="24" height="24" rx="6" fill="url(#igGrad)"/>
-          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4.5" fill="none" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="17.2" cy="6.8" r="1.3" fill="#ffffff"/>
-        </svg>
-      </a>
+  <main class="wrap">
+    <div id="log" class="log" aria-live="polite"></div>
+    <div class="composer">
+      <label for="tema">Tema</label>
+      <textarea id="tema" placeholder="Digite o tema…"></textarea>
+      <div class="actions">
+        <button id="btnEnviar" class="btn primary">Enviar</button>
+        <button id="btnNova" class="btn">Nova pesquisa</button>
+      </div>
     </div>
-  </nav>
-
-  <header class="hero"><div id="quote" class="quote">—</div><div id="author" class="author"></div></header>
-
-  <nav class="tabs" role="tablist">
-    <button class="tab-btn" aria-selected="true" aria-controls="tab-gerador" id="tabbtn-gerador">Gerador</button>
-    <button class="tab-btn" aria-selected="false" aria-controls="tab-book" id="tabbtn-book">Arquivo</button>
-    <button class="tab-btn" aria-selected="false" aria-controls="tab-dicas" id="tabbtn-dicas">Dicas</button>
-  </nav>
-
-  <!-- Gerador -->
-  <section id="tab-gerador" class="tab-content is-active">
-    <main class="panel">
-      <div class="field-wrap">
-        <h3 class="label">Qual seu objetivo?</h3>
-        <select id="strategy" class="field">
-          <option value="explicacao">Explicação Básica</option>
-          <option value="resumo">Resumo Objetivo</option>
-          <option value="artigo">Análise Detalhada</option>
-          <option value="aplicacao">Aplicação Prática</option>
-          <option value="simulado">Exercícios/Testes</option>
-          <option value="faq">Perguntas Frequentes</option>
-          <option value="debate">Debate/Reflexão</option>
-          <option value="atualizacao">Contexto Atualizado</option>
-          <option value="plano">Plano de Estudo</option>
-          <option value="apresentacao">Apresentação Oral</option>
-          <option value="slide">Slide</option>
-          <option value="jurisprudencia">Jurisprudência</option>
-        </select>
-      </div>
-      <div class="field-wrap">
-        <h3 class="label">Vamos falar sobre o quê?</h3>
-        <textarea id="theme" class="field" placeholder="Digite o tema"></textarea>
-      </div>
-      <div class="actions-out">
-        <div class="actions-buttons">
-          <button id="generate" class="btn btn-primary">Gerar</button>
-          <button id="copy" class="btn btn-copy">Copiar</button>
-          <button id="reset" class="btn btn-reset">Reiniciar</button>
-        </div>
-        <textarea id="result" class="output" placeholder="Prompt gerado aqui..." readonly></textarea>
-      </div>
-    </main>
-  </section>
-
-  <!-- Book -->
-  <section id="tab-book" class="tab-content">
-    <main class="panel">
-      <h2 class="label">Arquivo – Suas últimas 500 gerações</h2>
-      <p class="field" style="min-height:0;margin-top:0">Carrega automaticamente de 10 em 10 enquanto você rola.</p>
-      <div id="book-list" class="book-list"></div>
-    </main>
-  </section>
-
-  <!-- Dicas -->
-  <section id="tab-dicas" class="tab-content">
-    <main class="panel">
-      <h2 class="label">Dicas de Uso — como cada objetivo gera a resposta</h2>
-      <div class="field" style="white-space:pre-wrap"><b>Explicação Básica</b> — definição curta, 2–3 analogias e 3 pontos-chave, mais 2 erros comuns e um mini-exemplo. 
-
-<b>Resumo Objetivo</b> — conceito em 2 linhas, base legal, estrutura, 3 diferenças fáceis de confundir, tendências, 3 pegadinhas e 2 mini-cases.
-
-<b>Análise Detalhada</b> — artigo acadêmico: introdução (problema, relevância, hipótese), desenvolvimento (conceitos, correntes, análise crítica, jurisprudência), conclusão (síntese + proposta).
-
-<b>Aplicação Prática</b> — caso fictício, enquadramento jurídico, solução provável, mini-modelo de peça e checklist.
-
-<b>Exercícios/Testes</b> — 5 questões (2 fáceis, 2 médias, 1 difícil) com gabarito comentado.
-
-<b>FAQ</b> — 15 perguntas essenciais respondidas em até 3 linhas, mais 2 confusões comuns corrigidas.
-
-<b>Debate/Reflexão</b> — problema central, 3 argumentos pró e 3 contra, 1 dilema prático, perguntas-guia.
-
-<b>Contexto Atualizado</b> — panorama legislativo e jurisprudencial recente, impactos práticos, pontos controversos.
-
-<b>Plano de Estudo</b> — cronograma de 4 semanas, rotina de revisão espaçada, exercícios e erros comuns.
-
-<b>Apresentação em Sala</b> — discurso de ~4 min: abertura, contexto, base legal/doutrina/jurisprudência segura, caso ilustrativo, argumentação, fechamento forte.
-
-<b>Jurisprudência (Radar)</b> — 15 itens verificados (tribunal, nº, ano, tese resumida, impacto prático).
-
-💡 Escreva o tema de forma específica (ex.: “tutela de urgência, art. 300, CPC/2015”), dando contexto e objetivo. Rode também no <b>Gemini</b>.
-      </div>
-    </main>
-  </section>
-
-  <div class="footer"></div>
-
-  <nav class="tabbar" role="tablist">
-    <button aria-selected="true" aria-controls="tab-gerador" id="m-tabbtn-gerador"><span class="lbl">Gerar</span></button>
-    <button aria-selected="false" aria-controls="tab-book" id="m-tabbtn-book"><span class="lbl">Arquivo</span></button>
-    <button aria-selected="false" aria-controls="tab-dicas" id="m-tabbtn-dicas"><span class="lbl">Dicas</span></button>
-  </nav>
-
+  </main>
   <script>
-    // Frase aleatória
-    const QUOTES=['Não há liberdade sem lei. — Montesquieu','A justiça sem força é impotente; a força sem justiça é tirana. — Pascal'];
-    function loadRandomQuote(){const pick=QUOTES[Math.floor(Math.random()*QUOTES.length)];const parts=pick.split('—');document.getElementById('quote').textContent=(parts[0]||pick).trim();document.getElementById('author').textContent=parts[1]?'— '+parts[1].trim():'';}
-    loadRandomQuote();
+    (function(){
+      const log=document.getElementById('log');
+      const tema=document.getElementById('tema');
+      const btnEnviar=document.getElementById('btnEnviar');
+      const btnNova=document.getElementById('btnNova');
 
-    // Tabs
-    const tabIds=['gerador','book','dicas'];
-    function activateTab(id){for(const t of tabIds){document.getElementById('tab-'+t).classList.toggle('is-active',t===id);document.getElementById('tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));document.getElementById('m-tabbtn-'+t)?.setAttribute('aria-selected',String(t===id));}}
-    for(const t of tabIds){document.getElementById('tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));document.getElementById('m-tabbtn-'+t)?.addEventListener('click',()=>activateTab(t));}
+      const pick=a=>a[Math.floor(Math.random()*a.length)];
+      const pause={greet:()=>2200+Math.random()*1200,confirm:()=>1800+Math.random()*800};
+      const VARS={
+        greet1:[
+          'Olá, tudo bem por aí? Espero que seu dia esteja sendo leve e produtivo. ✨',
+          'Oi! Que bom te ver por aqui. Pronto(a) pra mais uma rodada de estudos?',
+          'E aí, como você está hoje? Bora aprender juntos com calma e foco?'
+        ],
+        askGoal:['Me conta: qual é o foco agora?','Qual destes objetivos combina mais com você hoje?','Pra começar bem, escolha um objetivo 👇'],
+        askTema:['Perfeito 🙌 Agora me diga qual é o tema que você gostaria de trabalhar.','Show! Qual assunto você quer explorar hoje?','Maravilha! Digite em uma linha o tema que precisa estudar.'],
+        received:['Recebi o seu tema 👌 Vou preparar o prompt com carinho…','Show, já anotei. Estou estruturando um prompt caprichado pra você…','Legal! Entendi o tema e já estou montando a melhor versão pra te ajudar.'],
+        celebrate:['Uhul! 🚀 Seu prompt ficou pronto e está excelente.','Prontinho! ✨ Estruturei com cuidado, agora é só copiar e usar.','Tudo certo 🙌 Seu prompt está finalizado e no ponto.'],
+        restart:['Vamos lá para uma nova pesquisa! 🔄','Recomeçando com gás! Escolha o novo objetivo 👇','Nova pesquisa chegando, manda ver no objetivo! ✨']
+      };
 
-    // ===== Gerador: Templates + handlers =====
-    const TEMPLATES = {
-      explicacao: (tema) => `Você é um **tutor de Direito** no Brasil, especialista em didática jurídica.  
-Persona: professor paciente e criativo, que explica para iniciantes.  
-Linguagem: simples, clara, sem juridiquês; use exemplos práticos e analogias do cotidiano.  
+      function bubble(html,who){const r=document.createElement('div');r.className='row '+(who||'bot');const b=document.createElement('div');b.className='bubble';b.innerHTML=html;r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;return r;}
+      function typing(){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="bubble"><span class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></div>';log.appendChild(r);log.scrollTop=log.scrollHeight;return{remove:()=>r.remove()};}
+      async function say(html,kind='confirm'){const t=typing();await new Promise(r=>setTimeout(r,pause[kind]()));t.remove();bubble(html,'bot');}
 
-Tarefa: Explique o tema **${tema}** de forma **muito didática e acessível**, como se estivesse pegando na mão do estudante iniciante.  
-Estrutura:  
-1) Definição essencial (até 3 linhas).  
-2) 2–3 analogias do cotidiano.  
-3) Explicação passo a passo (do básico ao detalhe, sempre explicando o porquê).  
-4) Mini-exemplo prático (caso simples e realista).  
-5) Resumo executivo (3 a 5 frases curtas com pontos-chave).  
-6) Checklist para o estudante (3 a 5 perguntas de autoavaliação).  
-
-Recursos: headings (H2–H3), listas, parágrafos curtos, termos-chave em **negrito**, metáforas e histórias curtas quando útil.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: frase motivacional final + síntese em 2 frases.`,
-      resumo: (tema) => `Você é um **resumidor jurídico** no Brasil, especialista em síntese clara e objetiva.  
-Persona: professor prático e direto, que entrega apenas o essencial para uma leitura rápida.  
-Linguagem: concisa, sem enrolação, sem juridiquês exagerado.  
-
-Tarefa: Produza um **resumo rápido e estruturado** sobre **${tema}**, destacando só o que realmente importa para fixar o conteúdo.  
-Estrutura:  
-1) Definição objetiva (1–2 linhas).  
-2) Pontos-chave (3 a 5 tópicos curtos e numerados).  
-3) Aplicações práticas mais comuns (até 3 itens).  
-4) Armadilhas ou erros frequentes (até 2).  
-5) Fecho em formato “lembrete” (1–2 frases curtas).  
-
-Recursos: headings (H2–H3), listas, palavras-chave em **negrito**, frases curtas.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: síntese final em 2 frases (estilo “flashcard”).`,
-      artigo: (tema) => `Você é um **jurista pesquisador** no Brasil, especialista em produção acadêmica aplicada ao ensino jurídico.  
-Persona: acadêmico crítico, mas acessível, que conecta teoria, jurisprudência e prática forense.  
-Linguagem: técnica e clara, mas envolvente; parágrafos curtos (2–3 linhas); uso moderado de termos técnicos explicados de forma simples.  
-
-Tarefa: Produza um **artigo acadêmico abrangente e memorável** sobre **${tema}**, que aprofunde o conhecimento do estudante e o surpreenda pela riqueza de conteúdo.  
-Estrutura:  
-1) **Introdução**: relevância prática, problema central e hipótese.  
-2) **Desenvolvimento**:  
-   - Conceitos essenciais e evolução histórica.  
-   - Correntes doutrinárias (principais posições, prós e contras).  
-   - Entendimentos jurisprudenciais majoritários (STJ, STF ou tribunais relevantes).  
-   - **Casos concretos**: apresente 1–2 julgados paradigmáticos ou situações realistas para análise prática.  
-   - Reflexos na prática processual (como o tema aparece em petições, decisões, audiências ou julgamentos).  
-   - Pontos de tensão ou controvérsias atuais.  
-3) **Conclusão**: síntese crítica + tendências jurisprudenciais e propostas de aplicação prática.  
-
-Recursos: headings (H2–H3), listas sempre que possível, termos-chave em **negrito**, exemplos e comparações para fixar a ideia.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: resumo executivo (2–3 frases) + referências essenciais (até 5, com autor, título e ano).`,
-      aplicacao: (tema) => `Você é um **advogado experiente e professor de prática jurídica** no Brasil.  
-Persona: prático, direto, como quem treina estagiários e jovens advogados.  
-Linguagem: objetiva, mas explicativa; conectando teoria mínima à prática forense real.  
-
-Tarefa: Explique **${tema}** de forma **abrangente e aplicada**, cobrindo todos os ângulos possíveis da prática jurídica.  
-Estrutura:  
-1) Contextualização inicial: relevância do tema no dia a dia forense.  
-2) Enquadramento jurídico: dispositivos legais e fundamentos principais.  
-3) Prática processual:  
-   - Como o tema aparece em petições iniciais, defesas, recursos ou sustentações.  
-   - Estratégias práticas adotadas por advogados e procuradores.  
-   - Orientações para atuação em audiência e fase recursal.  
-4) Jurisprudência aplicada: entendimentos majoritários que impactam a prática.  
-5) Casos concretos: 1–2 exemplos realistas com análise da solução jurídica.  
-6) Erros comuns na atuação prática e como evitá-los.  
-7) Checklist profissional: lista de pontos de atenção para quem atua com o tema.  
-
-Recursos: headings (H2–H3), listas, termos-chave em **negrito**, exemplos narrados em forma de caso.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: resumo executivo em 2–3 frases com recomendações práticas finais.`,
-      simulado: (tema) => `Você é um **professor de Direito** no Brasil, especialista em preparação para provas da OAB e concursos.  
-Persona: avaliador exigente, mas didático, que usa o simulado como forma de ensino.  
-Linguagem: objetiva, clara, sem juridiquês excessivo; explicações sempre conectadas à prática jurídica.  
-
-Tarefa: Elabore um **simulado de 10 questões de múltipla escolha** sobre **${tema}**, no estilo OAB/concurso, com gabarito comentado.  
-Estrutura:  
-1) Cada questão deve ter enunciado claro e 4 alternativas (A–D).  
-2) Indicar a alternativa correta logo após cada questão.  
-3) Explicar em até 5 linhas:  
-   - Por que a correta está certa.  
-   - Por que as outras estão erradas.  
-4) Variar os tipos de questão: conceitual, jurisprudencial, prática processual e casos concretos.  
-5) Ao final, incluir um **quadro-resumo** com os principais pontos cobrados no simulado.  
-
-Recursos: headings (H2–H3), listas, termos-chave em **negrito**.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: mensagem motivacional curta (“Se você errou, ótimo: é sinal de aprendizado!”).`,
-      faq: (tema) => `Você é um **professor de Direito e mentor acadêmico** no Brasil, especialista em estimular pensamento crítico.  
-Persona: provocador e instigante, que faz o estudante refletir além do óbvio.  
-Linguagem: clara, acessível, mas reflexiva; respostas completas, conectando teoria, jurisprudência e prática.  
-
-Tarefa: Produza uma sequência de **perguntas e respostas** sobre **${tema}**, que ajude o estudante a ter uma visão mais ampla do assunto.  
-Estrutura:  
-1) 8 a 10 perguntas estratégicas, em ordem crescente de complexidade.  
-2) Cada resposta deve:  
-   - Explicar o conceito central.  
-   - Conectar com casos concretos ou situações práticas.  
-   - Destacar divergências doutrinárias ou jurisprudenciais.  
-   - Apontar impactos sociais, políticos ou econômicos quando cabível.  
-3) Alternar perguntas básicas (“O que é…?”) com perguntas críticas (“Por que há controvérsia…?” / “Quais os riscos práticos…?”).  
-4) Ao final, incluir um **bloco de reflexões**: 3 a 5 provocações para debate em sala ou estudo em grupo.  
-
-Recursos: headings (H2–H3), listas, termos-chave em **negrito**, parágrafos curtos.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: síntese em 2–3 frases + pergunta final aberta para reflexão (“E você, como aplicaria esse conceito na prática?”).`,
-      debate: (tema) => `Você é um **moderador acadêmico** que organiza um **debate jurídico simulado** entre grandes correntes doutrinárias, jurisprudenciais e práticas forenses sobre **${tema}**.  
-Persona: dinâmico e instigante, conduzindo o debate com ritmo envolvente, mas sempre claro e organizado.  
-Linguagem: acadêmica, mas acessível; tom vivo, como se fosse uma mesa-redonda.  
-
-Tarefa: Produza um **debate acadêmico memorável** sobre **${tema}**, explorando todas as linhas possíveis do Direito.  
-Estrutura:  
-1) **Abertura do Moderador**: breve contextualização do tema e provocação inicial.  
-2) **Apresentação das correntes**:  
-   - Doutrinador clássico (visão histórica).  
-   - Doutrina contemporânea (visão atualizada).  
-   - Jurisprudência dominante (STJ/STF ou tribunais relevantes).  
-   - Voz prática (advogado ou juiz, trazendo o olhar da prática forense).  
-   - Voz crítica (sociológica, constitucional ou de direitos humanos).  
-3) **Debate vivo**:  
-   - Cada “personagem” apresenta seus argumentos em blocos curtos.  
-   - Réplicas e tréplicas destacando convergências e divergências.  
-   - Inclusão de **casos concretos** e julgados paradigmáticos para dar realismo.  
-4) **Síntese do Moderador**: costura final, destacando aprendizados, tensões não resolvidas e pontos pacíficos.  
-5) **Reflexão Final**: convite ao estudante para posicionar-se (“Com qual corrente você se identifica? Como aplicaria isso na prática?”).  
-
-Recursos: headings (H2–H3), diálogos curtos identificados por personagens, termos-chave em **negrito**, exemplos práticos e jurisprudenciais.  
-Regras: sem links; enunciados, súmulas e jurisprudência só se 100% segura.  
-
-Fecho: resumo executivo (2–3 frases) + desafio prático ao estudante.`,
-      atualizacao: (tema) => `Você é um **jurista analista de jurisprudência consolidada** no Brasil.  
-Persona: pesquisador criterioso e atualizado, que mostra o “estado da arte” da Justiça sobre o tema.  
-Linguagem: clara, objetiva e técnica, sem juridiquês excessivo.  
-
-Tarefa: Produza um **mapa dos entendimentos majoritários** sobre **${tema}**, destacando como o tema é tratado pela Justiça na atualidade.  
-Estrutura:  
-1) Panorama inicial: relevância prática do tema.  
-2) Linha majoritária atual: explique a posição predominante dos tribunais (STJ, STF, TST, etc.).  
-3) Súmulas aplicáveis (se houver), com resumo didático do seu conteúdo.  
-4) Tendências: eventuais mudanças ou reforços de entendimento nos últimos anos.  
-5) Reflexos práticos: como esse entendimento impacta a advocacia, o processo e a vida do cidadão.  
-
-Recursos: headings (H2–H3), listas, termos-chave em **negrito**, parágrafos curtos.  
-Regras:  
-- Não citar números de processos ou acórdãos específicos.  
-- Pode citar súmulas ou enunciados consolidados.  
-- Sempre dar ênfase ao **norte prático**: “o que prevalece hoje na Justiça”.  
-
-Fecho: síntese em 2–3 frases, apontando segurança conceitual para o estudante.`,
-      plano: (tema) => `Você é um **coach de estudos jurídicos** especialista em memorização.  
-Persona: motivador, organizado.  
-Linguagem: objetiva e encorajadora.  
-
-Tarefa: Crie plano de estudo sobre **${tema}** para 4 semanas.  
-Estrutura:  
-1) Objetivo do ciclo.  
-2) Cronograma semanal (Semana 1–4).  
-3) Rotina de revisão espaçada (1-1-7-15).  
-4) Exercícios práticos.  
-5) Erros comuns e como evitar.  
-
-Recursos: listas e tabela simples em texto.  
-Regras: sem links.  
-
-Fecho: frase motivadora (2 linhas) + fontes (até 5).`,
-      apresentacao: (tema) => `Você é um **professor-coach de oratória jurídica** no Brasil, especialista em transformar conteúdo jurídico em fala clara e envolvente.  
-Persona: didático, direto e confiante; orienta como se estivesse **ensaiando junto** com o estudante.  
-Linguagem: frases curtas, ritmo de fala, termos-chave em **negrito**; evitar juridiquês desnecessário.
-
-Tarefa: Produza um **roteiro completo para apresentação oral de até 5 minutos** sobre **${tema}**, em formato quase passo a passo, cobrindo o conteúdo essencial e indicando **marcações de tempo**, **entonação**, **pausas** e **transições**.
-
-Estrutura (roteiro com tempo sugerido):
-1) **Abertura (0:00–0:20)** — gancho + definição em 1 frase.  
-   - [ENTONAÇÃO FORTE] Gancho que conecte com a realidade.  
-   - **Definição essencial** em linguagem leiga. [PAUSA CURTA]
-2) **Contexto & Problema (0:20–0:50)** — por que o tema importa na prática.  
-   - Onde aparece no dia a dia forense.  
-   - Risco/erro comum que justifica o estudo.
-3) **Mapa da Fala (0:50–1:10)** — apresente os **3 pilares** do tema.  
-   - “Hoje eu explico: **Pilar 1**, **Pilar 2**, **Pilar 3**.”
-4) **Pilar 1 (1:10–1:50)** — conceito + exemplo rápido.  
-   - Regra geral + exceção típica.  
-   - Miniaplicação prática (1–2 linhas).
-5) **Pilar 2 (1:50–2:30)** — requisitos/elementos + onde costuma dar erro.  
-   - Checklist prático (3 itens).  
-   - [ENTONAÇÃO DIDÁTICA] “Guarde isso: …”
-6) **Pilar 3 (2:30–3:10)** — efeitos/consequências + estratégia processual.  
-   - Como alegar/impugnar; quando vale insistir.
-7) **Caso Ilustrativo (3:10–3:50)** — microcaso em 3 atos.  
-   - Fato → Conflito → Solução **segundo a linha predominante**.  
-   - [PAUSA] 1 frase de moral do caso.
-8) **Entendimento Majoritário & Base Legal Essencial (3:50–4:20)**  
-   - O que **predomina hoje** nos tribunais (sem citar processos).  
-   - **Súmulas** pertinentes (se houver), resumidas em linguagem acessível.
-9) **Implicações Práticas & Erros Comuns (4:20–4:40)**  
-   - 2 impactos para a advocacia.  
-   - 2 erros frequentes e como evitar.
-10) **Fecho Memorável (4:40–5:00)** — resumo + frase forte.  
-    - 3 bullets de ouro (o que levar para a prova/peça).  
-    - [ENTONAÇÃO FIRME] Frase final que gruda.
-
-Recursos: headings (H2–H3), listas numeradas, marcações **[ENTONAÇÃO] [PAUSA] [TRANSIÇÃO]**, parágrafos curtos.  
-Regras: sem links; súmulas só se 100% seguras; não citar números de processos/acórdãos.  
-
-Fecho: lembrete motivacional curto (“Você domina o mapa: defina, mostre os pilares, ilustre o caso e feche com o entendimento majoritário.”).`,
-      jurisprudencia: (tema) => `Você é um **jurista analista de jurisprudência**.  
-Persona: pesquisador criterioso, atualizado, conecta decisões e impactos práticos.  
-Linguagem: clara, objetiva e técnica, sem juridiquês desnecessário.  
-
-Tarefa: Faça um **levantamento em notícias jurídicas e artigos acadêmicos/jurídicos disponíveis na web** sobre **${tema}**, entregando exatamente **15 itens numerados (não mais, não menos)** que contenham citações a julgados, jurisprudências, acórdãos, repetitivos ou súmulas relacionadas ao tema.  
-
-Estrutura de cada item:  
-- Tribunal / Súmula / Órgão (se houver).  
-- Número do processo ou da súmula (se houver).  
-- Ano do julgamento/publicação (se houver).  
-- Fonte (**com link completo, link direto do portal original, nunca do Google Notícias ou agregadores**).  
-- Tese central resumida em 2–3 linhas.  
-- Impacto prático (na advocacia, doutrina ou jurisprudência).  
-
-Regras:  
-- Não invente decisões.  
-- Enunciados, súmulas e jurisprudências só se 100% confirmados.  
-- Pesquise exclusivamente em **notícias jurídicas, artigos acadêmicos e portais confiáveis**.  
-- A análise deve se basear **no conteúdo publicado no site**, extraindo a informação e comentando brevemente.  
-- A saída deve conter apenas a lista numerada, sem comentários adicionais.`,
-      slide: (tema) => `Você é um **designer instrucional de Direito** no Brasil, especialista em transformar conteúdo jurídico em slides claros e impactantes.  
-Persona: professor visual, que organiza ideias em blocos simples e memoráveis.  
-Linguagem: objetiva, frases curtas, termos-chave em **negrito**; sem juridiquês.  
-
-Tarefa: Produza uma **sequência de slides de estudo** sobre **${tema}**, com estrutura visual clara, de **5 a 8 slides**.  
-
-Estrutura sugerida:
-- **Slide 1 (Título e Definição Essencial)**: nome do tema + definição em 1–2 linhas.  
-- **Slide 2 (Contexto e Relevância)**: por que o tema importa na prática.  
-- **Slide 3 (Pilares / Elementos Centrais)**: 3 a 5 bullets com conceitos-chave.  
-- **Slide 4 (Exemplo ou Caso Ilustrativo)**: microcaso em 3 bullets (fato → conflito → solução).  
-- **Slide 5 (Entendimento Majoritário / Súmulas)**: posição predominante da Justiça e súmulas relevantes.  
-- **Slide 6 (Implicações Práticas)**: reflexos no processo, advocacia e sociedade.  
-- **Slide 7 (Erros Comuns ou Armadilhas)**: 2–3 bullets com alertas.  
-- **Slide 8 (Fecho)**: resumo em 3 bullets de ouro + frase motivacional curta.  
-
-Recursos:  
-- Usar listas com 3–5 itens no máximo.  
-- Títulos curtos e marcantes.  
-- Palavras-chave em **negrito**.  
-- Parágrafos apenas quando indispensável (máx. 2 linhas).  
-
-Regras: sem links; súmulas só se 100% seguras; não citar números de processos/acórdãos.  
-
-Fecho: resumo final em 1 frase para reforço de memorização.`
-    };
-
-    const strategyEl = document.getElementById('strategy');
-    const themeEl = document.getElementById('theme');
-    const resultEl = document.getElementById('result');
-    const btnGen = document.getElementById('generate');
-    const btnCopy = document.getElementById('copy');
-    const btnReset = document.getElementById('reset');
-
-    btnGen.addEventListener('click', generate);
-    btnCopy.addEventListener('click', copyOut);
-    btnReset.addEventListener('click', resetAll);
-    themeEl.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='enter'){generate();}});
-
-    function strategyHumanName(v){
-      const map={
-        explicacao:'Explicação Básica', resumo:'Resumo Objetivo', artigo:'Análise Detalhada', aplicacao:'Aplicação Prática',
-        simulado:'Exercícios/Testes', faq:'FAQ', debate:'Debate/Reflexão', atualizacao:'Contexto Atualizado',
-        plano:'Plano de Estudo', apresentacao:'Apresentação Oral', jurisprudencia:'Jurisprudência', slide:'Slide'
-      }; return map[v]||v;
-    }
-
-    function generate(){
-      const s = strategyEl.value; const t = (themeEl.value||'').trim();
-      if(!s){ alert('Selecione o objetivo.'); return; }
-      if(!t){ alert('Digite o tema.'); themeEl.focus(); return; }
-      const tpl = TEMPLATES[s]; if(!tpl){ alert('Estratégia inválida.'); return; }
-      const out = tpl(t);
-      resultEl.value = out;
-
-      // Atualiza Book local automaticamente (máx. 500)
-      let bookData=[]; 
-      try{ bookData = JSON.parse(localStorage.getItem('book_data_v1')||'[]'); if(!Array.isArray(bookData)) bookData=[]; }catch{ bookData=[]; }
-      const entry = { objetivo: strategyHumanName(s), tema: t, prompt: out, ts: Date.now() };
-      bookData.unshift(entry);
-      if(bookData.length>500) bookData = bookData.slice(0,500);
-      try{ localStorage.setItem('book_data_v1', JSON.stringify(bookData)); }catch{}
-
-      // Se Book estiver aberto, re-renderiza
-      if(document.getElementById('tab-book').classList.contains('is-active')){ clearBookUI(); renderBatch(); }
-
-      window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
-    }
-
-    async function copyOut(){
-      if(!resultEl.value) return alert('Nada para copiar.');
-      try{
-        await navigator.clipboard.writeText(resultEl.value);
-        const old = btnCopy.textContent; btnCopy.textContent='COPIADO'; btnCopy.disabled=true;
-        setTimeout(()=>{ btnCopy.textContent=old; btnCopy.disabled=false; }, 1500);
-      }catch{
-        const ta = document.createElement('textarea'); ta.value = resultEl.value; ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.focus(); ta.select();
-        try{ document.execCommand('copy'); const old = btnCopy.textContent; btnCopy.textContent='COPIADO'; btnCopy.disabled=true; setTimeout(()=>{ btnCopy.textContent=old; btnCopy.disabled=false; }, 1500); }
-        catch{ alert('Não foi possível copiar. Selecione e use Ctrl/Cmd+C.'); }
-        finally{ document.body.removeChild(ta); }
+      async function greet(){
+        bubble(pick(VARS.greet1),'bot');
+        await say(pick(VARS.askGoal),'greet');
+        setTimeout(()=>{
+          const r=document.createElement('div');r.className='row bot';
+          const b=document.createElement('div');b.className='bubble';
+          const wrap=document.createElement('div');wrap.className='chips';
+          ['ENTENDER','TREINAR','PESQUISAR'].forEach(l=>{const c=document.createElement('div');c.className='chip';c.textContent=l;c.onclick=()=>onGoal(l);wrap.appendChild(c)});
+          b.appendChild(wrap);r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;
+        },600);
       }
-    }
 
-    function resetAll(){ strategyEl.value=''; themeEl.value=''; resultEl.value=''; window.scrollTo({top:0,behavior:'smooth'}); }
-
-    // ===== Book — persistência local (localStorage) =====
-    const BOOK_KEY='book_data_v1';
-    const PAGE_SIZE=10;
-    let bookData=[]; let bookCursor=0; const bookWrap=document.getElementById('book-list');
-
-    function loadBook(){ try{ bookData = JSON.parse(localStorage.getItem(BOOK_KEY)||'[]'); if(!Array.isArray(bookData)) bookData=[]; }catch{ bookData=[]; } }
-    function saveBook(){ try{ localStorage.setItem(BOOK_KEY, JSON.stringify(bookData)); }catch{} }
-    function truncate150(s){return (s||'').length>150?s.slice(0,150)+'…':s}
-
-    function clearBookUI(){ if(bookWrap){ bookWrap.innerHTML=''; bookCursor=0; } }
-    function renderBatch(){
-      if(!bookWrap) return; const end=Math.min(bookCursor+PAGE_SIZE, bookData.length); const frag=document.createDocumentFragment();
-      for(let i=bookCursor;i<end;i++){
-        const {objetivo,tema,prompt}=bookData[i];
-        const el=document.createElement('div'); el.className='book-item';
-        el.innerHTML=`<div class="book-meta"><div class="book-obj">${objetivo||'—'}</div><div class="book-tema">${truncate150(tema||'')}</div></div><div><button class="chipbtn" data-prompt="${String(prompt||'').replace(/"/g,'&quot;')}">Copiar</button></div>`;
-        frag.appendChild(el);
+      function onGoal(goal){
+        bubble(`Legal! Vamos seguir com <b>${goal}</b>.`,'bot');
+        setTimeout(()=>bubble(pick(VARS.askTema),'bot'),500);
+        tema.focus();
       }
-      bookWrap.appendChild(frag); bookCursor=end;
-    }
-    function onScroll(){ if(!bookWrap) return; const near=bookWrap.scrollTop+bookWrap.clientHeight>=bookWrap.scrollHeight-8; if(near && bookCursor<bookData.length) renderBatch(); }
-    bookWrap?.addEventListener('scroll', onScroll);
 
-    // carrega quando abrir a aba Book
-    const _activate=activateTab; activateTab=function(id){ _activate(id); if(id==='book'){ if(!bookData.length){ loadBook(); } if(bookCursor===0){ renderBatch(); } } }
+      async function onSend(){
+        const t=(tema.value||'').trim();
+        if(!t){await say('Antes de tudo, me diga qual é o <b>tema</b> 😉','confirm');return;}
+        bubble(t,'me');tema.value='';
+        await say(pick(VARS.received),'confirm');
+        await new Promise(r=>setTimeout(r,3000));
+        const r=document.createElement('div');r.className='row bot';
+        const b=document.createElement('div');b.className='bubble';
+        const wrap=document.createElement('div');wrap.className='stickerWrap';
+        const box=document.createElement('div');box.className='sticker';
+        const gifs=[
+          'https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif', // confete
+          'https://media.giphy.com/media/9J7tdYltWyXIY/giphy.gif',      // foguete
+          'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif',     // check/ok
+          'https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif',  // palmas
+          'https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif',      // brilho/celebração
+          'https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif', // vitória/troféu
+          'https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif', // dança
+          'https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif'       // nerd/ok
+        ];
+        const img=document.createElement('img');
+        img.src=pick(gifs);
+        img.decoding='async';
+        img.loading='lazy';
+        img.alt='Celebrando prompt criado';
+        box.appendChild(img);
+        wrap.appendChild(box);b.appendChild(wrap);r.appendChild(b);log.appendChild(r);log.scrollTop=log.scrollHeight;
+        await new Promise(r=>setTimeout(r,1800));
+        await say(pick(VARS.celebrate),'confirm');
+        const rowBtns=bubble('', 'bot');
+        const wrapBtns=document.createElement('div');wrapBtns.className='actions';
+        wrapBtns.appendChild(mkCopyBtn('Copiar p/ ChatGPT','Prompt simulado para ChatGPT'));
+        wrapBtns.appendChild(mkCopyBtn('Copiar p/ Gemini','Prompt simulado para Gemini'));
+        wrapBtns.appendChild(mkCopyBtn('Copiar p/ Perplexity','Prompt simulado para Perplexity'));
+        rowBtns.querySelector('.bubble').appendChild(wrapBtns);
+        const ref=bubble(pick(VARS.restart),'bot');
+        const wrapRef=document.createElement('div');wrapRef.className='chips';
+        const novo=document.createElement('div');novo.className='chip';novo.textContent='Nova pesquisa';novo.onclick=startFresh;wrapRef.appendChild(novo);
+        ref.querySelector('.bubble').appendChild(wrapRef);
+      }
 
-    // Copiar (delegação Book)
-    document.addEventListener('click',async e=>{
-      const btn=e.target.closest('.chipbtn'); if(!btn||!btn.dataset.prompt) return;
-      try{ await navigator.clipboard.writeText(btn.dataset.prompt); btn.textContent='Copiado!'; setTimeout(()=>btn.textContent='Copiar',1200);}catch{ alert('Não foi possível copiar.'); }
-    });
+      function mkCopyBtn(label,text){const b=document.createElement('button');b.className='btn ghost';b.textContent=label;b.onclick=()=>copyText(text,b);return b;}
+      function copyText(text,btn){if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>flash(btn)).catch(()=>fallback(text,btn));}else{fallback(text,btn);}}
+      function fallback(text,btn){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch{}document.body.removeChild(ta);flash(btn);}
+      function flash(btn){const old=btn.textContent;btn.textContent='Copiado!';setTimeout(()=>btn.textContent=old,1200);}
+
+      function startFresh(){log.innerHTML='';tema.value='';greet();}
+
+      // ligar botões e envio
+      btnEnviar.addEventListener('click', onSend);
+      btnNova.addEventListener('click', startFresh);
+      tema.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();onSend();}});
+
+      let __booted=false;function safeStart(){if(__booted)return;__booted=true;startFresh();}
+      document.addEventListener('DOMContentLoaded',safeStart);
+      window.addEventListener('load',safeStart);
+      setTimeout(safeStart,0);
+    })();
   </script>
 </body>
 </html>
