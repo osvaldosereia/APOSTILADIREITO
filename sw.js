@@ -1,4 +1,7 @@
-const CACHE_NAME = 'dl-hotfix-999';
+// Service Worker - direito.love (GitHub Pages)
+// Pré-cache de assets estáticos + BK (.txt) + GIFs thinking
+
+const CACHE_NAME = 'dl-v15';
 
 const ASSETS = [
   './',
@@ -12,43 +15,48 @@ const ASSETS = [
   './kb/treinar.txt',
   './kb/raiox.txt',
 
-  // Frases aleatórias (20 linhas cada)
+  // Frases aleatórias
   './kb/greetings.txt',
   './kb/choice_ack.txt',
   './kb/thinking.txt',
 
-  // GIFs thinking (10 opções)
+  // GIFs (pensando) - ajuste esta lista se remover/renomear arquivos
   './icons/thinking1.gif',
   './icons/thinking2.gif',
   './icons/thinking3.gif',
+  './icons/thinking4.gif',
+  './icons/thinking5.gif',
   './icons/thinking6.gif',
   './icons/thinking7.gif',
   './icons/thinking8.gif',
+  './icons/thinking9.gif',
   './icons/thinking10.gif'
 ];
 
-// Instala o SW e faz o pré-cache
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS))
+// Instala e pré-carrega assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// Ativa o SW e limpa caches antigos
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))
-    ))
+// Ativa e limpa caches antigos
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k === CACHE_NAME ? null : caches.delete(k))))
+    )
   );
 });
 
-// Intercepta fetch e serve do cache ou rede
-self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
+// Responde do cache primeiro; se não tiver, busca na rede
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Só intercepta requisições do mesmo domínio
   if (url.origin === location.origin) {
-    e.respondWith(
-      caches.match(e.request).then(resp => resp || fetch(e.request))
+    event.respondWith(
+      caches.match(event.request).then((cached) => cached || fetch(event.request))
     );
   }
 });
