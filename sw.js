@@ -1,4 +1,5 @@
-const CACHE_NAME = 'dl-v3';
+const CACHE_NAME = 'dl-v8';
+
 const ASSETS = [
   './',
   './index.html',
@@ -16,25 +17,39 @@ const ASSETS = [
   './kb/choice_ack.txt',
   './kb/thinking.txt',
 
-  // Mídia usada no chat
-  './icons/thinking.gif'
+  // GIFs thinking (10 opções)
+  './icons/thinking1.gif',
+  './icons/thinking2.gif',
+  './icons/thinking3.gif',
+  './icons/thinking4.gif',
+  './icons/thinking5.gif',
+  './icons/thinking6.gif',
+  './icons/thinking7.gif',
+  './icons/thinking8.gif',
+  './icons/thinking9.gif',
+  './icons/thinking10.gif'
 ];
 
-self.addEventListener('install', (e)=>{
-  e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));
+// Instala o SW e faz o pré-cache
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS))
+  );
 });
 
-self.addEventListener('activate', (e)=>{
+// Ativa o SW e limpa caches antigos
+self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys=>Promise.all(
-      keys.map(k=> k===CACHE_NAME?null:caches.delete(k))
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => (k === CACHE_NAME ? null : caches.delete(k)))
     ))
   );
 });
 
-self.addEventListener('fetch', (e)=>{
+// Intercepta fetch e serve do cache ou rede
+self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
-  if(url.origin === location.origin){
+  if (url.origin === location.origin) {
     e.respondWith(
       caches.match(e.request).then(resp => resp || fetch(e.request))
     );
