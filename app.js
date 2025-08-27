@@ -1,10 +1,11 @@
 /**
- * direito.love — Simulador de Chat (v3)
+ * direito.love — Simulador de Chat (v4)
  * - BK em TXT: aprender.txt, treinar.txt, raiox.txt
- * - Frases aleatórias em TXT: greetings.txt, choice_ack.txt, thinking.txt (20 linhas cada)
+ * - Frases aleatórias em TXT: greetings.txt, choice_ack.txt, thinking.txt
  * - Botões 1 por linha, surgindo em cascata
- * - Digitação mais lenta (do início ao fim)
- * - Fluxo: saudação (aleatória) → pergunta + botões (em cascata) → tema → pensando (frase + gif + frase aleatória) → copiar → agradecimento final
+ * - Digitação mais lenta, auto-scroll sempre na última
+ * - GIF "pensando" aleatório entre 10 opções (icons/thinking1.gif ... thinking10.gif)
+ * - Fluxo: saudação → pergunta + botões → tema → pensando (frase + gif) → pronto (copiar) → agradecimento
  */
 
 const State = {
@@ -26,7 +27,7 @@ function scrollToBottomAlways() {
 const chatObserver = new MutationObserver(() => scrollToBottomAlways());
 chatObserver.observe(chatEl, { childList: true, subtree: true });
 
-/* ---------- Util ---------- */
+/* ---------- Utils ---------- */
 async function fetchTxt(path) {
   const res = await fetch(path, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Falha ao carregar: ${path}`);
@@ -34,10 +35,7 @@ async function fetchTxt(path) {
 }
 async function loadLines(file) {
   const txt = await fetchTxt(`kb/${file}`);
-  return txt
-    .split('\n')
-    .map(s => s.trim())
-    .filter(Boolean);
+  return txt.split('\n').map(s => s.trim()).filter(Boolean);
 }
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -64,7 +62,7 @@ function addMsg({ text, role = 'sys', html = false }) {
   return b;
 }
 
-/* digitação mais lenta: 28–42ms por char */
+/* Digitação mais lenta ~28–42ms por caractere */
 async function typeAndAppend(text) {
   const container = document.createElement('div');
   container.className = 'chat__msg chat__msg--sys';
@@ -74,12 +72,12 @@ async function typeAndAppend(text) {
   scrollToBottomAlways();
   for (const ch of text) {
     buf.textContent += ch;
-    await wait(28 + Math.random() * 14); // ~mais lento
+    await wait(28 + Math.random() * 14);
   }
   scrollToBottomAlways();
 }
 
-/* ---------- Composer ---------- */
+/* ---------- Composer (tema) ---------- */
 function renderQ2() {
   composerEl.innerHTML = `
     <div class="composer__inner">
@@ -115,10 +113,10 @@ function renderQ2() {
 
 /* ---------- Botões em cascata ---------- */
 async function renderChoiceButtonsCascata() {
-  // Mensagem de pergunta (sempre antes dos botões)
+  // Mensagem da pergunta
   await typeAndAppend('Me diga, como posso te ajudar hoje?');
 
-  // Container dos botões (uma bolha separada, lista 1 por linha)
+  // Container dos botões (bolha separada, 1 por linha)
   const box = document.createElement('div');
   box.className = 'chat__msg chat__msg--sys';
   const list = document.createElement('div');
@@ -134,9 +132,9 @@ async function renderChoiceButtonsCascata() {
     { key: 'raiox',    label: 'Raio-X do Tema' }
   ];
 
-  // Inserção 1 a 1 com pequeno delay e animação
+  // Inserção em cascata
   for (const btnDef of buttons) {
-    await wait(220); // intervalo curto e elegante
+    await wait(220);
     const btn = document.createElement('button');
     btn.className = 'btn btn--primary btn-in';
     btn.textContent = btnDef.label;
@@ -152,7 +150,7 @@ async function renderChoiceButtonsCascata() {
 
 /* ---------- Fluxo ---------- */
 async function boot() {
-  // 1) Saudação aleatória (greetings.txt)
+  // Saudação aleatória
   try {
     const greetings = await loadLines('greetings.txt');
     await typeAndAppend(pickRandom(greetings));
@@ -161,14 +159,13 @@ async function boot() {
   }
 
   await wait(500);
-  // 2) Pergunta + botões (em cascata)
   await renderChoiceButtonsCascata();
   State.step = 'q1';
 }
 
 async function onChoice() {
-  // “Boa escolha” aleatória (choice_ack.txt)
   await wait(500);
+  // “Boa escolha” aleatória
   try {
     const acks = await loadLines('choice_ack.txt');
     await typeAndAppend(pickRandom(acks));
@@ -181,8 +178,8 @@ async function onChoice() {
 }
 
 async function buildPrompt() {
-  // “Pensando” aleatória + gif
   await wait(700);
+  // “Pensando” aleatória
   try {
     const thinkLines = await loadLines('thinking.txt');
     await typeAndAppend(pickRandom(thinkLines));
@@ -190,11 +187,13 @@ async function buildPrompt() {
     await typeAndAppend('Hmm... deixa eu pensar aqui 🤔');
   }
 
+  // GIF aleatório (tenha icons/thinking1.gif ... thinking10.gif)
+  const thinkingGifs = Array.from({ length: 10 }, (_, i) => `icons/thinking${i+1}.gif`);
+  const gifChoice = thinkingGifs[Math.floor(Math.random() * thinkingGifs.length)];
   await wait(900);
-  // Gif: coloque o arquivo em icons/thinking.gif
   const gifWrap = document.createElement('div');
   gifWrap.className = 'chat__msg chat__msg--sys';
-  gifWrap.innerHTML = `<img src="icons/thinking.gif" alt="Pensando..." style="max-width:120px;border-radius:12px">`;
+  gifWrap.innerHTML = `<img src="${gifChoice}" alt="Pensando..." style="max-width:120px;border-radius:12px">`;
   chatEl.appendChild(gifWrap);
   scrollToBottomAlways();
 
