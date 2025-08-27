@@ -1,14 +1,23 @@
-const CACHE_NAME = 'dl-v2';
+const CACHE_NAME = 'dl-v3';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './manifest.json',
-  './frases.txt',
+
+  // BK prompts
   './kb/aprender.txt',
   './kb/treinar.txt',
-  './kb/raiox.txt'
+  './kb/raiox.txt',
+
+  // Frases aleatórias (20 linhas cada)
+  './kb/greetings.txt',
+  './kb/choice_ack.txt',
+  './kb/thinking.txt',
+
+  // Mídia usada no chat
+  './icons/thinking.gif'
 ];
 
 self.addEventListener('install', (e)=>{
