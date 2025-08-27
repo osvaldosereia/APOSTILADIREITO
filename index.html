@@ -1,52 +1,73 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0b3b4a" />
-<title>direito.love — Simulador de Chat</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b3b4a" />
+  <title>direito.love — Simulador de Chat</title>
 
+  <!-- Ícone e PWA (opcional) -->
+  <link rel="icon" href="./favicon.svg">
+  <link rel="manifest" href="./manifest.json">
 
-<!-- Manifest & PWA -->
-<link rel="manifest" href="./manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-
-<!-- Favicon inline (SVG) -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230b3b4a'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='34' fill='white' font-family='Inter,Arial,sans-serif'>dl</text></svg>">
-
-
-<link rel="preload" href="./styles.css" as="style">
-<link rel="stylesheet" href="./styles.css">
+  <!-- CSS (SEMPRE caminho relativo + cache-busting) -->
+  <link rel="preload" href="./styles.css?v=101" as="style">
+  <link rel="stylesheet" href="./styles.css?v=101">
+  <style>
+    /* Salvaguardas mínimas, caso o styles.css não carregue */
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;margin:0;color:#0b3b4a}
+    .topbar{position:sticky;top:0;background:#fff;border-bottom:1px solid #e6eef2;z-index:10}
+    .topbar__inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:12px 16px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#0b3b4a;font-weight:700}
+    .brand__text{letter-spacing:.2px}
+    .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;opacity:.9;text-decoration:none}
+    .icon-btn:hover{opacity:1}
+    .app{max-width:860px;margin:0 auto;padding:16px}
+    .chat{min-height:56vh;display:flex;flex-direction:column;gap:12px}
+    .chat__msg{background:#f7fafc;border:1px solid #e6eef2;border-radius:14px;padding:12px 14px;max-width:90%}
+    .chat__msg--user{align-self:flex-end;background:#e6f7ff;border-color:#cfefff}
+    .composer{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 30%);padding-top:8px}
+    .composer__inner{background:#fff;border:1px solid #e6eef2;border-radius:16px;padding:12px}
+    .row{display:flex;gap:8px;align-items:flex-start}
+    .textarea{flex:1;min-height:38px;border:1px solid #e6eef2;border-radius:12px;padding:10px;font:inherit}
+    .btn{appearance:none;border:none;border-radius:12px;padding:12px 14px;font-weight:600;cursor:pointer}
+    .btn--primary{background:#0b3b4a;color:#fff}
+    .btn--success{background:#2a9d8f;color:#fff}
+    .btn--ghost{background:transparent;border:1px solid #e6eef2}
+    .btn-list{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:12px}
+    @keyframes btnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .btn-in{animation:btnIn .18s ease-out both}
+    .typing{display:inline-flex;gap:6px}
+    .dot{width:6px;height:6px;border-radius:50%;background:#b6c6ce;animation:bounce 1s infinite ease-in-out}
+    .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+  </style>
 </head>
 <body>
-<header class="topbar" role="banner">
-<div class="topbar__inner">
-<div class="brand" aria-label="direito.love">
-<!-- Logo inline SVG -->
-<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M12 21s-6-4.35-6-9a6 6 0 1 1 12 0c0 4.65-6 9-6 9z" fill="#e63946"/>
-</svg>
-<span class="brand__text">direito.love</span>
-</div>
-<a class="brand__insta" href="https://instagram.com/osvaldosereiajr" target="_blank" rel="noopener">@osvaldosereiajr</a>
-</div>
-</header>
+  <header class="topbar" role="banner">
+    <div class="topbar__inner">
+      <a class="brand" aria-label="direito.love" href="./">
+        <!-- coração -->
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 21s-6.5-4.5-8.5-8.1C1.9 9.1 3.3 5.5 6.6 5.1c1.9-.2 3.1.8 3.9 1.9.8-1.1 2-2.1 3.9-1.9 3.3.4 4.7 4 3.1 7.8C18.5 16.5 12 21 12 21z" fill="#e63946"/>
+        </svg>
+        <span class="brand__text">direito.love</span>
+      </a>
+      <!-- insta discreto -->
+      <a class="icon-btn" href="https://instagram.com/osvaldosereiajr" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#0b3b4a" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zM18 6.25a1.25 1.25 0 1 1-1.25 1.25A1.25 1.25 0 0 1 18 6.25z"/>
+        </svg>
+      </a>
+    </div>
+  </header>
 
+  <main id="app" class="app" role="main">
+    <section id="chat" class="chat" aria-live="polite" aria-label="Conversas"></section>
+    <div id="composer" class="composer" role="region" aria-label="Área de escrita"></div>
+  </main>
 
-<main id="app" class="app" role="main">
-<section id="chat" class="chat" aria-live="polite" aria-label="Conversas"></section>
-
-
-<div id="composer" class="composer" role="region" aria-label="Área de escrita">
-<!-- O composer é gerenciado dinamicamente pelo app.js -->
-</div>
-</main>
-
-
-
-
-<script defer src="./app.js"></script>
+  <!-- JS (SEMPRE caminho relativo + cache-busting) -->
+  <script defer src="./app.js?v=101"></script>
 </body>
 </html>
