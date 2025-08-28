@@ -117,36 +117,8 @@
   // ===== Fluxo =====
 async function greet(){
   await botSay(tzGreeting());
-  // quebra-gelo (1x/dia)
-  try{
-    const ICE = [
-      '“Todo grande jurista começou confuso. A diferença? Continuou.”',
-      '“Não precisa saber tudo. Precisa querer entender.”',
-      '“Seu esforço de hoje é o argumento de autoridade de amanhã.”',
-      '“Estudar Direito é construir pontes entre dúvida e clareza.”',
-      '“Tem dia que você estuda muito. Tem dia que só abre o app. Tudo conta.”',
-      '“Jurídico também se escreve com coragem. E começa agora.”',
-      '“Não existe ‘cérebro jurídico’. Existe treino.”',
-      '“Seu eu do futuro vai agradecer por esse clique de agora.”',
-      '“Direito se aprende como se constrói um caso: peça por peça.”',
-      '“Errar hoje é só mais uma prova de que você está tentando.”'
-    ];
-    const today = new Date().toISOString().slice(0,10);
-    const last = localStorage.getItem('ice_day');
-    let msg = null;
-    if (last !== today) {
-      const idx = Math.floor(Math.random() * ICE.length);
-      localStorage.setItem('ice_day', today);
-      localStorage.setItem('ice_idx', String(idx));
-      msg = ICE[idx];
-    } else {
-      const idx = Number(localStorage.getItem('ice_idx') || '0');
-      msg = ICE[idx % ICE.length];
-    }
-    await botSay(`<blockquote>${msg}</blockquote>`);
-  } catch(_) {}
   await botSay('qual tema você quer estudar hoje? <span class="small">(ex.: “furto – art. 155”, “tutela de urgência”, “controle de constitucionalidade”)</span>');
-  state.phase = 'ask_tema';
+  state.phase='ask_tema';
 }
 
   async function askDepth(){
