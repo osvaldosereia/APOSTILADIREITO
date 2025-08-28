@@ -1,42 +1,327 @@
 <!doctype html>
-await botSay('Certo, preparando seu prompt…', 700, 1000);
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>direito.love — Gerador de Prompts</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --panel:#ffffff; --ink:#0f172a; --muted:#6b7280; --border:#e5e7eb;
+      --primary:#0ea5e9; --chip:#eef6ff;
+      /* variável para teclado (fallback também usa) */
+      --kb: 64px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink); background:linear-gradient(180deg,#f9fbff,#f5f7fb 40%,#eef2f7)
+    }
+    .wrap{min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px}
+    .phone{width:100%; max-width:440px; background:var(--panel); border:1px solid var(--border);
+      border-radius:24px; box-shadow:0 10px 30px rgba(15,23,42,.08); overflow:hidden; position:relative}
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px;
+      border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:30}
+    .brand{font-weight:800; font-size:18px; letter-spacing:.2px}
+    .insta{display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px;
+      text-decoration:none; background:radial-gradient(120% 120% at 10% 10%,#f9ce34,#ee2a7b 60%,#6228d7); box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .insta svg{width:16px; height:16px; color:#fff}
 
+    .chat{
+      padding:16px; display:flex; flex-direction:column; gap:10px; height:560px; overflow:auto; scroll-behavior:smooth;
+      background:linear-gradient(180deg,#fff 0,#fff 40%, #f9fafb);
+      padding-bottom:calc(var(--kb) + 96px);
+    }
+    .bubble{max-width:85%; padding:12px 14px; border-radius:16px; font-size:14px; line-height:1.48; box-shadow:0 2px 12px rgba(2,6,23,.06)}
+    .bot{align-self:flex-start; background:#f7fafc; border:1px solid var(--border)}
+    .user{align-self:flex-end; background:#0ea5e9; color:#fff}
 
-// Mostra "pensando" com ícone (sem GIF), espera 1.2s
-showThinking();
-await sleep(1200);
-hideThinking();
+    .typing{display:inline-flex; gap:6px; align-items:center}
+    .dot{width:6px; height:6px; border-radius:50%; background:#9ca3af; opacity:.6; animation:blink 1s infinite}
+    .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+    @keyframes blink{0%,60%{opacity:.2} 30%{opacity:1}}
 
+    .options{display:flex; flex-direction:column; gap:8px; margin-top:6px}
+    .chip{border:1px solid var(--border); background:var(--chip); color:#0b3b4a; padding:9px 12px; border-radius:12px; font-size:13px; cursor:pointer; text-align:left}
+    .chip:hover{filter:brightness(.98)} .chip:active{transform:scale(.98)}
+    .chip.cta{background:var(--primary); color:#fff; border-color:var(--primary); font-weight:700; text-align:center; box-shadow:0 6px 18px rgba(14,165,233,.25)}
+    .options .chip.cta{align-self:stretch}
 
-const prompt = `${estr.build(tema)}
+    .small{font-size:12px; color:var(--muted)}
 
+    /* Composer flutuante — usa var(--kb) para subir com teclado */
+    .composer{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:var(--kb); width:80%; background:#fff; border:1px solid var(--border); border-radius:16px;
+      box-shadow:0 8px 24px rgba(15,23,42,.08); padding:8px; display:flex; gap:8px; align-items:center; z-index:20
+    }
+    .composer input{flex:1; border:0; outline:none; background:transparent; font-size:14px; padding:10px 8px}
+    .composer button{border:0; padding:10px 14px; border-radius:12px; background:var(--primary); color:#fff; font-weight:600; cursor:pointer}
 
-Tom sugerido: ${tom}.`;
+    .footer{padding:12px 16px; border-top:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center}
+    pre{white-space:pre-wrap; word-break:break-word; background:#0b1220; color:#e5e7eb; padding:14px; border-radius:12px; font-size:12.5px}
+    .copy{margin-top:8px; background:#111827; color:#fff; border:0; padding:10px 12px; border-radius:12px; font-size:12.5px; cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="phone" role="region" aria-label="Chatbot Jurídico — MVP">
+      <div class="topbar">
+        <div class="brand">direito.love</div>
+        <a class="insta" href="https://instagram.com/osvaldosereiajr" target="_blank" rel="noopener" aria-label="Instagram @osvaldosereiajr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      </div>
 
+      <div id="chat" class="chat" aria-live="polite"></div>
 
-const box = el('div','card');
-box.style.padding = '10px';
-const pre = el('pre','prompt');
-pre.textContent = prompt;
-const actions = el('div','actions');
-const bCopy = el('button','btn primary','Copiar');
-const bReset = el('button','btn muted','Reiniciar');
-actions.append(bCopy,bReset);
-box.append(pre, actions);
-chat.appendChild(box);
-scrollBottom();
+      <div class="composer" aria-label="Entrada de tema">
+        <input id="tema" placeholder="Digite um tema (ex.: Furto – art. 155)" />
+        <button id="send">Enviar</button>
+      </div>
 
+      <div class="footer"><span class="small">Simulação • tema → escolhas → prompt</span></div>
+    </div>
+  </div>
 
-bCopy.addEventListener('click', async ()=>{
-try{ await navigator.clipboard.writeText(prompt); toastShow('Prompt copiado!'); }
-catch(e){ console.error(e); toastShow('Falha ao copiar'); }
-});
-bReset.addEventListener('click', ()=> location.reload());
-});
+  <script>
+  // ===== Utils =====
+  const tzGreeting = ()=>{ try{ const h=new Date().getHours(); return h<12?'bom dia! 👋': h<18?'boa tarde! 👋':'boa noite! 👋'; }catch(_){ return 'olá! 👋'; } };
+  const sleep = (ms)=> new Promise(r=>setTimeout(r,ms));
+  const chat = document.getElementById('chat');
+  const temaInput = document.getElementById('tema');
+  const sendBtn = document.getElementById('send');
+  function el(tag, cls, html){ const n=document.createElement(tag); if(cls) n.className=cls; if(html!==undefined) n.innerHTML=html; return n; }
+  function scrollBottom(){ chat.scrollTop = chat.scrollHeight; }
+  function bubble(html, who='bot'){ const b=el('div',`bubble ${who}`,html); chat.appendChild(b); scrollBottom(); return b; }
+  function typing(){ const t=el('div','bubble bot'); const w=el('div','typing'); w.appendChild(el('span','dot')); w.appendChild(el('span','dot')); w.appendChild(el('span','dot')); t.appendChild(w); chat.appendChild(t); scrollBottom(); return t; }
+  async function showThinking(ms=1700){ const t=typing(); await sleep(ms); t.remove(); }
+  async function botSay(html, delayMs=1600){ const t=typing(); await sleep(delayMs); t.remove(); bubble(html,'bot'); }
+
+  // ===== Constantes do fluxo genérico =====
+  const DEPTH=[
+    'Explicação Rápida (Matar Curiosidade)',
+    'Explicação Detalhada (Professor dos Bons)',
+    'Pesquisa Aprofundada (Se ler tudo vira mestre)'
+  ];
+  const MUST=['Checklist','Tabelas','Caso concreto','Questões','Comparações','Exemplos práticos']; // até 2
+  const JURIS=['Não precisa','Se vier certa, eu quero','Tem que ter'];
+
+  // ===== Estado =====
+  const state={ tema:'', depth:null, must:new Set(), juris:null, phase:'idle' };
+
+  // ===== Fluxo =====
+  async function greet(){
+    await botSay(tzGreeting());
+    // quebra-gelo (1x/dia)
+    try{
+      const ICE=[
+        'prometo não falar latim sem necessidade 😉',
+        'ops… comecei a cantar no meio do expediente 🎶 já voltei! qual o tema?',
+        'hoje é zero decoreba, 100% entendimento. qual assunto atacamos?',
+        'o juridiquês vai entrar aqui e sair traduzido. tema, por favor?',
+        'pode mandar um tema feio/confuso. eu organizo tudo.',
+        'se eu errar, a culpa é do autocorretor jurídico 😅. qual o tema?',
+        'bora fazer um sumário tão claro que até o seu eu do futuro agradece?',
+        'trouxe café, foco e boa vontade. você traz o tema?',
+        'prometo não usar latim sem necessidade (só se for muito estiloso). qual o tema?',
+        'ops… me distrai com um meme de súmula 🤦‍♂️ voltei! qual o tema?'
+      ];
+      const today=new Date().toISOString().slice(0,10);
+      const last=localStorage.getItem('ice_day');
+      let msg=null;
+      if(last!==today){ const idx=Math.floor(Math.random()*ICE.length); localStorage.setItem('ice_day',today); localStorage.setItem('ice_idx',String(idx)); msg=ICE[idx]; }
+      else{ const idx=Number(localStorage.getItem('ice_idx')||'0'); msg=ICE[idx%ICE.length]; }
+      await botSay(msg);
+    }catch(_){}
+    await botSay('qual tema você quer estudar hoje? <span class="small">(ex.: “furto – art. 155”, “tutela de urgência”, “controle de constitucionalidade”)</span>');
+    state.phase='ask_tema';
+  }
+
+  async function askDepth(){
+    bubble('<strong>Nível de Profundidade</strong>','bot');
+    await showThinking(1700);
+    const box=el('div','options');
+    DEPTH.forEach((label,idx)=>{
+      const b=el('button','chip',label);
+      b.addEventListener('click',()=>{ state.depth=idx; bubble(label,'user'); box.remove(); askMust(); });
+      box.appendChild(b);
+    });
+    chat.appendChild(box); scrollBottom();
+  }
+
+  async function askMust(){
+    bubble('<strong>O que não pode faltar na sua resposta?</strong> <span class="small">(até 2 itens)</span>','bot');
+    await showThinking(1700);
+    const box=el('div','options');
+    const hint=el('div','small','restam 2 escolhas'); box.appendChild(hint);
+    MUST.forEach((label)=>{
+      const b=el('button','chip',label);
+      b.addEventListener('click',()=>{
+        if(state.must.has(label)){ state.must.delete(label); b.style.opacity=''; }
+        else{ if(state.must.size>=2){ return; } state.must.add(label); b.style.opacity='.75'; }
+        const rest = 2 - state.must.size; hint.textContent = `restam ${rest} escolha${rest===1?'':'s'}`;
+      });
+      box.appendChild(b);
+    });
+    const cont=el('button','chip cta','Continuar →');
+    cont.addEventListener('click',()=>{ bubble([...state.must].join(', ')||'Sem preferências','user'); box.remove(); askJuris(); });
+    box.appendChild(cont);
+    chat.appendChild(box); scrollBottom();
+  }
+
+  async function askJuris(){
+    bubble('<strong>Sobre jurisprudências, súmulas e enunciados</strong>','bot');
+    await showThinking(1700);
+    const box=el('div','options');
+    JURIS.forEach((label,idx)=>{
+      const b=el('button','chip',label);
+      b.addEventListener('click',()=>{ state.juris=idx; bubble(label,'user'); box.remove(); showNoteAndCTA(); });
+      box.appendChild(b);
+    });
+    chat.appendChild(box); scrollBottom();
+  }
+
+  async function showNoteAndCTA(){
+    await botSay('<strong>Observação importante</strong><br>Nossos prompts são para te transformar em um mestre em Direito. A gente te ajuda a estudar. Por isso as respostas têm linguagem simples, para facilitar a compreensão e a memorização.');
+    bubble('tudo pronto?','bot');
+    await showThinking(1700);
+    const box=el('div','options');
+    const go=el('button','chip cta','Gerar prompt');
+    go.addEventListener('click',()=>{ box.remove(); finalizePrompt(); });
+    box.appendChild(go);
+    chat.appendChild(box); scrollBottom();
+  }
+
+  function mustRules(){
+    const arr=[...state.must]; if(arr.length===0) return '';
+    const map={
+      'Checklist':'- Inclua um checklist de 5 passos para analisar o tema.\n',
+      'Tabelas':'- Se houver comparações, apresente um quadro/tabela para sintetizar as diferenças.\n',
+      'Caso concreto':'- Traga pelo menos 1 caso concreto (mini-caso) resolvido em 3–5 linhas.\n',
+      'Questões':'- Inclua 1 questão objetiva (com gabarito) e 1 discursiva curta (com espelho).\n',
+      'Comparações':'- Compare com institutos próximos para evitar confusões clássicas.\n',
+      'Exemplos práticos':'- Dê exemplos práticos além do caso, para fixação de conceitos.\n',
+    }; return arr.map(x=>map[x]).join('');
+  }
+
+  function buildPrompt(){
+    const tema = state.tema || 'Tema jurídico';
+    const depthIdx = state.depth ?? 1;
+    const depthLabel = DEPTH[depthIdx];
+    const jurisLabel = JURIS[state.juris ?? 1];
+    const mustArr = [...state.must];
+
+    // Curto (para Nível = Rápida)
+    const short =
+`Explique **${tema}** como professor de Direito, em ${depthLabel}.
+Estrutura: Diagnóstico → Sumário → Desenvolver só o 1º item → Resumo (5 pontos) → “Continuar?”.
+${mustArr.length?`Extras (até 2): ${mustArr.join(', ')}.\n`:''}JURIS=${jurisLabel}: inclua somente com link (ConJur/Migalhas/JOTA/Âmbito/JusBrasil; Planalto apenas p/ texto legal).
+Se não achar com segurança, avise e sugira checagem oficial.`;
+
+    // Avançado (para Nível = Detalhada/Aprofundada)
+    const advanced =
+`Você é professor universitário de Direito.
+Explique o tema **${tema}** com alta qualidade pedagógica, seguindo as regras abaixo.
+
+## 1) Estilo e profundidade
+${depthIdx===0?`- Resposta rápida: essencial em 200–300 palavras; sem jargão.`:(depthIdx===1?`- Explicação detalhada: didática completa com exemplos úteis (600–900 palavras).`:`- Pesquisa aprofundada: análise densa (1000–1400 palavras) com nuances e divergências quando existirem.`)}
+Linguagem clara e simples. Formate em **Markdown** (títulos, listas e, quando aplicável, tabelas).
+
+## 2) Estrutura mínima (sempre)
+1. **Diagnóstico do tema**: classe (material/processual/jurisprudencial/misto), base legal principal e confusões comuns.
+2. **Sumário estratégico**: só tópicos pertinentes (sem encher linguiça).
+3. **Desenvolvimento do 1º item** do sumário (apenas o primeiro, com qualidade).
+4. **Resumo final**: 5 pontos-chave para memorizar.
+5. Pergunte ao final: “Deseja que eu continue para o próximo item?”.
+
+## 3) Elementos opcionais (ativar no máximo 2)
+${mustArr.includes('Checklist')?`- **Checklist** de 5 passos para analisar o tema.\n`:''}${mustArr.includes('Tabelas')?`- **1 tabela** comparativa objetiva (cabeçalhos claros).\n`:''}${mustArr.includes('Caso concreto')?`- **1 mini-caso** resolvido em 3–5 linhas (situação → enquadramento → conclusão).\n`:''}${mustArr.includes('Questões')?`- **1 objetiva (com gabarito)** + **1 discursiva curta (com espelho).\n`:''}${mustArr.includes('Comparações')?`- **Comparar 1–2 institutos próximos** e realçar distinções-chave.\n`:''}${mustArr.includes('Exemplos práticos')?`- **2 exemplos práticos** breves além do mini-caso.\n`:''}
+## 4) Jurisprudência / súmulas / enunciados — Estratégia de pesquisa (${jurisLabel})
+${state.juris===0?`- **OMITIR**: não inclua; só citar se indispensável (com link).`:
+`Quando **${jurisLabel}** ≠ OMITIR, siga antes de escrever:
+1) Consultas focadas (2–3 variações): ${tema} + ("jurisprudência" OR "súmula" OR "acórdão" OR "leading case" OR "tema repetitivo") e (STF OR STJ OR TST OR TSE).
+2) Prioridade de fontes: **ConJur, Migalhas, JOTA, Âmbito Jurídico, JusBrasil/Artigos, RT online**. **Evitar** sites governamentais (exceto **Planalto** p/ texto legal).
+3) Checagem: abrir 2–3 resultados e confirmar tribunal, nº do processo/tema/súmula, ano e tese.
+4) Recência: preferir últimos 5 anos; se antigo mas dominante, justificar.
+5) **Citação com link (obrigatória)**: sempre cite a fonte com **link** em Markdown. Ex.: *STJ, Tema 1234 – Tese X (2019). Fonte: ConJur* [(link)](https://...).
+${state.juris===1?`6) Política PANORAMA: 1–2 itens dominantes com links.`:`6) Política OBRIGATÓRIA: 2–3 itens (≥1 leading case/súmula), com links.`}`
 }
+## 5) Regras de qualidade/segurança
+- Cite lei/artigo apenas quando tiver segurança; se houver chance de desatualização, avise e proponha verificação.
+- Se faltar dado confiável, diga “não localizado com segurança” e sugira a fonte normativa típica.
+- Se o aluno marcou algo que não se aplica, **explique por que omitiu**.`;
 
+    const useShort = (depthIdx===0);
+    return useShort ? short : advanced;
+  }
 
-init();
-</script>
+  async function finalizePrompt(){
+    await botSay('pensando…', 3000);
+    await botSay(`seu prompt está pronto para **${state.tema}** ✅
+Toque em **Copiar prompt** e cole na IA (GPT, Gemini, Claude…).`, 800);
+    const pre=el('pre'); const prompt=buildPrompt(); pre.textContent=prompt; chat.appendChild(pre);
+    const copy=el('button','copy','Copiar prompt');
+    copy.addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(prompt); copy.textContent='Copiado! ✅';
+        await botSay('obrigado por estudar comigo! 💙');
+        await showThinking(1800);
+        const again=el('button','copy','Nova pesquisa');
+        again.addEventListener('click', ()=>{ chat.innerHTML=''; state.tema=''; state.depth=null; state.must.clear(); state.juris=null; greet(); });
+        chat.appendChild(again); scrollBottom();
+      }catch(e){ copy.textContent='Falhou :('; }
+    });
+    chat.appendChild(copy); scrollBottom();
+  }
+
+  // ===== Entrada =====
+  sendBtn.addEventListener('click', async ()=>{
+    if(state.phase==='idle' || state.phase==='ask_tema'){
+      state.tema = temaInput.value.trim();
+      if(!state.tema){ await botSay('me dá um exemplo, tipo **tutela de urgência** ou **furto – art. 155** 😉'); return; }
+      bubble(state.tema,'user');
+      await botSay('beleza. agora me diga o **nível de profundidade**.');
+      state.phase='wizard';
+      askDepth();
+    }
+  });
+  temaInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') sendBtn.click(); });
+
+  // ===== Teclado mobile — híbrido (visualViewport + fallback)
+  let BASE = window.innerHeight;
+  function setKB(px){
+    const v = Math.max(px, 64);
+    document.documentElement.style.setProperty('--kb', v + 'px');
+    scrollBottom();
+  }
+  function adjustForKeyboard(){
+    try{
+      if(window.visualViewport){
+        const vv = window.visualViewport;
+        const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        setKB(kb + 16); return;
+      }
+      // fallback (iframes / preview)
+      const kb = Math.max(0, BASE - window.innerHeight);
+      setKB(kb + 16);
+    }catch(_){}
+  }
+  window.addEventListener('resize', adjustForKeyboard);
+  if(window.visualViewport){
+    visualViewport.addEventListener('resize', adjustForKeyboard);
+    visualViewport.addEventListener('scroll', adjustForKeyboard);
+  }
+  temaInput.addEventListener('focus', ()=>{ setTimeout(adjustForKeyboard, 50); });
+  temaInput.addEventListener('blur',  ()=>{ setKB(64); });
+
+  // start
+  greet();
+  setKB(64);
+  </script>
 </body>
 </html>
