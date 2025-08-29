@@ -11,9 +11,10 @@
   :root{
     --ink:#0b1020; --muted:#7a8aa1; --border:#e6ebf4;
     --primary:#0c4160; --accent:#1aab6c;
-    --glass: rgba(255,255,255,.62);
-    --glass-2: rgba(255,255,255,.35);
-    --shadow: 0 10px 30px rgba(20,25,40,.18);
+    --glass: rgba(255,255,255,.58);
+    --glass-2: rgba(255,255,255,.32);
+    --shadow: 0 6px 18px rgba(20,25,40,.12);          /* mais discreta */
+    --shadow-sm: 0 3px 10px rgba(20,25,40,.10);       /* compacta */
   }
   *{ box-sizing:border-box }
   html,body{ height:100% }
@@ -24,13 +25,19 @@
       radial-gradient(900px 600px at 10% -10%, #e9faf3 0%, transparent 60%),
       radial-gradient(1000px 700px at 120% 0%, #ecf5ff 0%, transparent 55%),
       linear-gradient(180deg,#f7f9ff 0%, #eef2f7 100%);
-    font-weight:400; /* base mais leve */
+    font-weight:400;
+    padding-top:78px; /* espaço para header fixo */
   }
-  .blob{ position:fixed; filter: blur(40px); z-index:0; opacity:.55; pointer-events:none; width:420px; height:420px; left:-120px; top:-120px; background: radial-gradient(45% 45% at 50% 50%, #8ed1c7 0%, transparent 100%); }
+  .blob{ position:fixed; filter: blur(36px); z-index:0; opacity:.50; pointer-events:none; width:420px; height:420px; left:-120px; top:-120px; background: radial-gradient(45% 45% at 50% 50%, #8ed1c7 0%, transparent 100%); }
   .blob.b2{ width:520px; height:520px; right:-160px; top:-80px; left:auto; background: radial-gradient(45% 45% at 50% 50%, #b6d3ff 0%, transparent 100%); }
   .wrap{ position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:22px 16px 140px }
 
-  /* header glass */
+  /* header glass fixo */
+  .header-wrap{
+    position:fixed; inset:0 0 auto 0; z-index:40;
+    padding:10px 16px;
+    background: transparent;
+  }
   .top{
     backdrop-filter: saturate(120%) blur(6px);
     background: linear-gradient(180deg, var(--glass) 0%, var(--glass-2) 100%);
@@ -38,12 +45,12 @@
     border-radius:16px;
     box-shadow: var(--shadow);
     display:flex; justify-content:space-between; align-items:center;
-    padding:10px 14px; margin-bottom:14px;
+    padding:10px 14px; max-width:1100px; margin:0 auto;
   }
   .brand{ display:flex; align-items:center; gap:10px }
   .logo{ height:28px; width:auto }
   .right-icons a{ display:inline-flex; align-items:center; justify-content:center; border-radius:12px; }
-  .right-icons img{ height:22px; width:22px }
+  .right-icons img{ height:28px; width:28px } /* maior e mais legível */
 
   /* tabs */
   .tabs{ display:flex; gap:8px; margin:10px 0 18px }
@@ -51,8 +58,8 @@
     all:unset; cursor:pointer; letter-spacing:.2px;
     padding:10px 14px; border-radius:999px;
     background:linear-gradient(180deg,#ffffffcc,#f4f7ffcc);
-    border:1px solid #e4e9f3; box-shadow: var(--shadow);
-    font-weight:700; /* mais leve que 800/900 */
+    border:1px solid #e4e9f3; box-shadow: var(--shadow-sm);
+    font-weight:700;
   }
   .tab[aria-selected="true"]{
     color:#fff; border-color:transparent;
@@ -61,33 +68,36 @@
 
   /* cards */
   .card{
-    background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.70));
+    background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.68));
     border:1px solid rgba(255,255,255,.7);
     border-radius:22px;
     box-shadow: var(--shadow);
     padding:22px; position:relative; overflow:hidden;
   }
-  .title{ margin:0 0 10px; font-size:clamp(22px,4vw,36px); font-weight:700; letter-spacing:.2px } /* 700 */
+  .title{ margin:0 0 10px; font-size:clamp(22px,4vw,36px); font-weight:700; letter-spacing:.2px }
 
   /* inputs & buttons */
-  .row{ display:grid; gap:12px; grid-template-columns:1fr auto }
+  .row{ display:grid; gap:12px; grid-template-columns:1fr auto; align-items:stretch }
   .field{
     background:linear-gradient(180deg,#f5f8ff,#eef3fb);
     border:1px solid #dae3f2; color:var(--ink);
     border-radius:16px; padding:14px 16px; outline:none;
-    box-shadow: inset 0 1px 0 #fff, 0 6px 16px rgba(20,25,40,.06);
-    font-weight:500; /* menos pesado */
+    box-shadow: inset 0 1px 0 #fff, var(--shadow-sm);
+    font-weight:500;
   }
-  .field:focus{ border-color:#b7c7e6; box-shadow: inset 0 1px 0 #fff, 0 0 0 4px rgba(26,171,108,.12), 0 6px 16px rgba(20,25,40,.06) }
-  .btn{ all:unset; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:16px; cursor:pointer; font-weight:600 } /* 600 */
+  .field:focus{ border-color:#b7c7e6; box-shadow: inset 0 1px 0 #fff, 0 0 0 4px rgba(26,171,108,.10), var(--shadow-sm) }
+  .btn{
+    all:unset; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 16px; border-radius:16px; cursor:pointer; font-weight:600
+  }
   .btn-primary{
     color:#fff; background:linear-gradient(180deg,#0d547c,#0c4160);
-    box-shadow: 0 8px 22px rgba(12,65,96,.28), inset 0 1px 0 rgba(255,255,255,.18);
+    box-shadow: 0 6px 18px rgba(12,65,96,.22), inset 0 1px 0 rgba(255,255,255,.14);
   }
   .btn-primary:hover{ transform:translateY(-1px) }
   .btn-ghost{
     background:linear-gradient(180deg,#ffffff,#f3f6ff);
-    border:1px solid #e6ecf6; color:#0b2238; box-shadow: var(--shadow)
+    border:1px solid #e6ecf6; color:#0b2238; box-shadow: var(--shadow-sm)
   }
   .btn-small{ padding:6px 10px; font-size:12px; border-radius:12px; font-weight:600 }
   .btn-disabled{ opacity:.5; cursor:not-allowed; pointer-events:none }
@@ -99,14 +109,14 @@
   .grid-obj{ display:grid; gap:16px; grid-template-columns:1fr }
   @media (min-width: 768px){ .grid-obj{ grid-template-columns:1fr 1fr 1fr } }
   .obj{
+    position:relative;
     background:linear-gradient(180deg,#ffffff,#f5f8ff);
     border:1px solid #e8eef7; border-radius:18px; padding:16px; cursor:pointer;
-    box-shadow: 0 10px 24px rgba(20,25,40,.08);
+    box-shadow: var(--shadow-sm);
     transition: transform .12s ease, box-shadow .12s ease;
   }
-  .obj:hover{ transform:translateY(-3px); box-shadow: 0 16px 32px rgba(20,25,40,.14) }
-  .obj h3{ margin:0 0 8px; font-size:18px; display:flex; align-items:center; gap:10px; font-weight:700 } /* 700 */
-  .obj img{ height:92px; width:auto; border-radius:16px; box-shadow: 0 8px 20px rgba(20,25,40,.12) }
+  .obj:hover{ transform:translateY(-2px); box-shadow: var(--shadow) }
+  .obj h3{ margin:0 0 8px; font-size:18px; display:flex; align-items:center; gap:10px; font-weight:700 }
 
   .subtle{ margin:6px 0 10px; color:#6e7e95; font-weight:600; font-size:13px; letter-spacing:.3px; text-transform:uppercase }
 
@@ -115,10 +125,14 @@
   .chip{
     all:unset; padding:10px 12px; border-radius:999px; cursor:pointer;
     background:linear-gradient(180deg,#ffffff,#eef3ff);
-    border:1px solid #e6ecf6; box-shadow: var(--shadow);
-    font-size:14px; font-weight:600; /* 600 */
+    border:1px solid #e6ecf6; box-shadow: var(--shadow-sm);
+    font-size:14px; font-weight:600;
   }
-  .chip.plus{ font-weight:700; padding:10px 12px; }
+  .toggle-extra{
+    position:absolute; top:12px; right:12px;
+    padding:6px 10px; border-radius:12px; font-weight:700;
+    background:#fff; border:1px solid #e6ecf6; box-shadow: var(--shadow-sm);
+  }
   .hidden{ display:none }
 
   .divider{ height:1px; background:#ecf0f6; margin:18px 0 }
@@ -127,13 +141,13 @@
   .floatbar{ position:fixed; left:16px; right:16px; bottom:16px; z-index:50; display:flex; justify-content:flex-end; pointer-events:none }
   .floatbar .inner{
     pointer-events:auto; display:flex; gap:8px; padding:10px;
-    backdrop-filter: blur(6px) saturate(120%);
-    background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.70));
-    border:1px solid rgba(255,255,255,.8); border-radius:16px; box-shadow: var(--shadow);
+    backdrop-filter: blur(5px) saturate(120%);
+    background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.72));
+    border:1px solid rgba(255,255,255,.8); border-radius:16px; box-shadow: var(--shadow-sm);
   }
   .toast{
     position:fixed; z-index:60; right:16px; bottom:84px; background:#0d5a86; color:#fff;
-    padding:12px 16px; border-radius:12px; box-shadow: var(--shadow); display:none; font-weight:700
+    padding:12px 16px; border-radius:12px; box-shadow: var(--shadow-sm); display:none; font-weight:700
   }
 
   /* modal ação após copiar */
@@ -145,18 +159,29 @@
     width:min(560px,92vw);
     background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
     border:1px solid rgba(240,243,250,.9);
-    border-radius:18px; box-shadow: var(--shadow); padding:20px;
+    border-radius:18px; box-shadow: var(--shadow-sm); padding:20px;
     text-align:center;
   }
-  .sheet h4{ margin:0 0 10px; font-size:18px; font-weight:700 } /* 700 */
-  .sheet p{ margin:0 16px 16px; color:#516179; font-weight:500 }  /* 500 */
-  .sheet .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
+  .sheet h4{ margin:0 0 10px; font-size:18px; font-weight:700 }
+  .sheet .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px }
+
+  /* modal "como funciona" */
+  .modal{
+    position:fixed; inset:0; display:none; place-items:center; z-index:80;
+    background:rgba(10,15,25,.30); backdrop-filter:blur(3px);
+  }
+  .modal .box{
+    width:min(680px,92vw);
+    background:#fff; border:1px solid #e7ecf6; border-radius:16px; box-shadow: var(--shadow);
+    padding:18px;
+  }
 </style>
 </head>
 <body>
   <div class="blob"></div><div class="blob b2"></div>
 
-  <div class="wrap">
+  <!-- Header fixo -->
+  <div class="header-wrap">
     <header class="top">
       <div class="brand"><img class="logo" src="./icons/logo-heart.png" alt="direito.love" /></div>
       <div class="right-icons">
@@ -165,7 +190,9 @@
         </a>
       </div>
     </header>
+  </div>
 
+  <div class="wrap">
     <nav class="tabs" role="tablist" aria-label="Navegação">
       <button class="tab" id="tab-inicio" aria-controls="panel-inicio" aria-selected="true">Início</button>
       <button class="tab" id="tab-arquivo" aria-controls="panel-arquivo" aria-selected="false">Arquivo</button>
@@ -187,36 +214,35 @@
 
       <!-- Passo 2 -->
       <div id="step2" class="hidden" style="margin-top:18px">
-        <h3 class="subtle" style="margin-left:4px">Qual o objetivo?</h3>
+        <!-- Título com mesma diagramação do anterior -->
+        <h1 class="title" style="margin-top:0">Perfeito. Qual o seu objetivo?</h1>
+
         <div class="grid-obj">
           <!-- APRENDER -->
           <div class="obj" data-objetivo="aprender" tabindex="0" role="button" aria-label="Escolher APRENDER">
             <h3>APRENDER</h3>
-            <img src="./icons/character-1.png" alt="Aluno animado" />
-            <div class="subtle">I.A.s sugeridas</div>
+            <button class="toggle-extra" data-more="aprender" title="Mostrar/ocultar outras IAs">+</button>
+            <div class="subtle">Clique para copiar o prompt</div>
             <div class="chips" data-chips="aprender"></div>
             <div class="chips hidden" data-extra="aprender"></div>
-            <button class="chip plus" data-more="aprender" title="Outras IAs">+</button>
           </div>
 
           <!-- TREINAR -->
           <div class="obj" data-objetivo="treinar" tabindex="0" role="button" aria-label="Escolher TREINAR">
             <h3>TREINAR</h3>
-            <img src="./icons/character-2.png" alt="Aluno sorridente" />
-            <div class="subtle">I.A.s sugeridas</div>
+            <button class="toggle-extra" data-more="treinar" title="Mostrar/ocultar outras IAs">+</button>
+            <div class="subtle">Clique para copiar o prompt</div>
             <div class="chips" data-chips="treinar"></div>
             <div class="chips hidden" data-extra="treinar"></div>
-            <button class="chip plus" data-more="treinar" title="Outras IAs">+</button>
           </div>
 
           <!-- ATUALIZAR -->
           <div class="obj" data-objetivo="atualizar" tabindex="0" role="button" aria-label="Escolher ATUALIZAR">
             <h3>ATUALIZAR</h3>
-            <img src="./icons/character-3.png" alt="Aluno acenando" />
-            <div class="subtle">I.A.s sugeridas</div>
+            <button class="toggle-extra" data-more="atualizar" title="Mostrar/ocultar outras IAs">+</button>
+            <div class="subtle">Clique para copiar o prompt</div>
             <div class="chips" data-chips="atualizar"></div>
             <div class="chips hidden" data-extra="atualizar"></div>
-            <button class="chip plus" data-more="atualizar" title="Outras IAs">+</button>
           </div>
         </div>
       </div>
@@ -245,11 +271,26 @@
   <!-- modal ação após copiar -->
   <div id="sheet" class="sheet" aria-modal="true" role="dialog" aria-labelledby="sheet-title">
     <div class="box">
-      <h4 id="sheet-title">Tudo certo!</h4>
-      <p>Agora é só colar o prompt na sua I.A. e bons estudos.</p>
+      <h4 id="sheet-title">Prompt Copiado</h4>
       <div class="actions">
         <a id="open-ia-modal" class="btn btn-primary" href="#" target="_blank" rel="noopener">Abrir IA</a>
         <button id="sheet-close" class="btn btn-ghost">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal "como funciona" -->
+  <div id="modal-how" class="modal" aria-modal="true" role="dialog" aria-labelledby="how-title">
+    <div class="box">
+      <h3 id="how-title" style="margin:0 0 10px; font-weight:700">Como funciona</h3>
+      <ol style="margin:0; padding-left:18px">
+        <li>Digite o <b>tema</b> e clique em <b>Avançar</b>.</li>
+        <li>Escolha um <b>objetivo</b>.</li>
+        <li>Clique na <b>IA</b> para <b>copiar o prompt</b>.</li>
+        <li>Use <b>Abrir IA</b> para ir direto à plataforma.</li>
+      </ol>
+      <div style="text-align:right; margin-top:10px">
+        <button id="how-close" class="btn btn-ghost btn-small">Fechar</button>
       </div>
     </div>
   </div>
@@ -258,12 +299,22 @@
   /* abas */
   const tabInicio=document.getElementById('tab-inicio'), tabArq=document.getElementById('tab-arquivo');
   const panelInicio=document.getElementById('panel-inicio'), panelArq=document.getElementById('panel-arquivo');
+  const resetBtn=document.getElementById('reset');
+
   function selectTab(which){
     const ini=which==='inicio';
     tabInicio.setAttribute('aria-selected',ini);
     tabArq.setAttribute('aria-selected',!ini);
     panelInicio.hidden=!ini; panelArq.hidden=ini;
-    if(!ini) renderBookGrouped();
+    if(!ini){
+      renderBookGrouped();
+      // desativa "Nova pesquisa" na aba Arquivo
+      resetBtn.classList.add('btn-disabled'); resetBtn.setAttribute('aria-disabled','true');
+      resetBtn.style.pointerEvents='none';
+    } else {
+      resetBtn.classList.remove('btn-disabled'); resetBtn.removeAttribute('aria-disabled');
+      resetBtn.style.pointerEvents='auto';
+    }
   }
   tabInicio.addEventListener('click',()=>selectTab('inicio'));
   tabArq.addEventListener('click',()=>selectTab('arquivo'));
@@ -276,14 +327,16 @@
     step2:document.getElementById('step2'),
     toast:document.getElementById('toast'),
     openIA:document.getElementById('open-ia'),
-    reset:document.getElementById('reset'),
     sheet:document.getElementById('sheet'),
     sheetClose:document.getElementById('sheet-close'),
     openIAModal:document.getElementById('open-ia-modal'),
-    bookGrouped:document.getElementById('book-grouped')
+    bookGrouped:document.getElementById('book-grouped'),
+    how:document.getElementById('modal-how'),
+    howBtn:document.getElementById('como-btn'),
+    howClose:document.getElementById('how-close'),
   };
 
-  const BOOK_KEY='book_data_v19';
+  const BOOK_KEY='book_data_v20';
   function load(k,fb){ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(fb));}catch{return fb} }
   function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
   function pushEntry(e){ let d=load(BOOK_KEY,[]); d.unshift(e); if(d.length>200) d=d.slice(0,200); save(BOOK_KEY,d); }
@@ -312,7 +365,6 @@
     current.tema=tema;
     el.step2.classList.remove('hidden');
     window.scrollTo({ top: el.step2.offsetTop-8, behavior:'smooth' });
-    // render iniciais
     ['aprender','treinar','atualizar'].forEach(k=>renderChips(k));
   });
 
@@ -323,16 +375,19 @@
     const moreBtn=document.querySelector(`[data-more="${objKey}"]`);
 
     cont.innerHTML=''; extra.innerHTML=''; extra.classList.add('hidden');
+    moreBtn.textContent='+';  // padrão começa fechado
 
     IA_RECOMENDADAS[objKey].forEach(ia=>{
       cont.appendChild(chip(ia, ()=>onIA(objKey, ia)));
     });
-
-    // extras = todas menos as recomendadas
     IA_OUTRAS.filter(ia=>!IA_RECOMENDADAS[objKey].includes(ia))
       .forEach(ia=> extra.appendChild(chip(ia, ()=>onIA(objKey, ia))));
 
-    moreBtn.onclick=()=>{ extra.classList.toggle('hidden'); };
+    moreBtn.onclick=()=>{ 
+      const isHidden = extra.classList.contains('hidden');
+      extra.classList.toggle('hidden');
+      moreBtn.textContent = isHidden ? '–' : '+';
+    };
   }
 
   function chip(label, onClick){
@@ -449,7 +504,6 @@ ${coreFooter(t)}`
       current.lastIA = ia;
       enableOpenIA(ia);      // botão flutuante
       updateModalIA(ia);     // botão do modal com nome/link da IA
-
       openSheet();           // abre modal central
     }catch{ alert('Não foi possível copiar.'); }
   }
@@ -480,20 +534,26 @@ ${coreFooter(t)}`
   function closeSheet(){ el.sheet.style.display='none'; }
   function updateModalIA(ia){
     const url = IA_LINKS[ia] || '#';
-    const btn = el.openIAModal;
-    btn.textContent = `Abrir ${ia}`;
-    btn.href = url;
+    el.openIAModal.textContent = `Abrir ${ia}`;
+    el.openIAModal.href = url;
   }
-  document.getElementById('sheet-close').addEventListener('click', closeSheet);
+  el.sheetClose.addEventListener('click', closeSheet);
   el.sheet.addEventListener('click', (e)=>{ if(e.target===el.sheet) closeSheet(); });
 
-  /* reset */
-  el.reset.addEventListener('click', ()=>{
+  /* modal como funciona */
+  el.howBtn.addEventListener('click', ()=> el.how.style.display='grid');
+  el.howClose.addEventListener('click', ()=> el.how.style.display='none');
+  el.how.addEventListener('click', (e)=>{ if(e.target===el.how) el.how.style.display='none'; });
+
+  /* reset (só funciona na aba Início) */
+  resetBtn.addEventListener('click', ()=>{
+    if (panelArq.hidden === false) return; // bloqueia na página Arquivo
     current={ tema:"", lastIA:null };
     document.getElementById('tema').value='';
     el.step2.classList.add('hidden');
     enableOpenIA(null);
     closeSheet();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   /* Abas: render do Arquivo */
@@ -509,11 +569,18 @@ ${coreFooter(t)}`
       c.innerHTML=`<h4 style="margin:0 0 8px; font-weight:700">${k}</h4>`;
       groups[k].forEach(it=>{
         const row=document.createElement('div');
-        row.style.cssText='display:flex;justify-content:space-between;gap:8px;border:1px solid #e8eef7;border-radius:12px;padding:10px;margin-bottom:8px;background:#fff';
+        row.style.cssText='display:flex;justify-content:space-between;gap:8px;border:1px solid #e8eef7;border-radius:12px;padding:10px;margin-bottom:8px;background:#fff; box-shadow: var(--shadow-sm)';
         row.innerHTML=`<div><b style="font-weight:600">${it.ia||'Padrão'}</b> • ${it.tema}<br><span style="color:#7a8aa1">${new Date(it.ts).toLocaleString()}</span></div>
-          <div><button class="btn btn-ghost btn-small" data-copy>Copiar</button></div>`;
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-small" data-copy>Copiar</button>
+          </div>`;
         row.querySelector('[data-copy]').addEventListener('click', async ()=>{
-          try{ await navigator.clipboard.writeText(String(it.prompt||'')); toast('Copiado!'); }catch{ alert('Não foi possível copiar.'); }
+          try{
+            await navigator.clipboard.writeText(String(it.prompt||''));
+            toast('Copiado!');
+            // ajusta botão fixo para a IA do item copiado
+            if (it.ia && IA_LINKS[it.ia]) enableOpenIA(it.ia);
+          }catch{ alert('Não foi possível copiar.'); }
         });
         c.appendChild(row);
       });
