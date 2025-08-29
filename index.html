@@ -24,6 +24,7 @@
       radial-gradient(900px 600px at 10% -10%, #e9faf3 0%, transparent 60%),
       radial-gradient(1000px 700px at 120% 0%, #ecf5ff 0%, transparent 55%),
       linear-gradient(180deg,#f7f9ff 0%, #eef2f7 100%);
+    font-weight:400; /* base mais leve */
   }
   .blob{ position:fixed; filter: blur(40px); z-index:0; opacity:.55; pointer-events:none; width:420px; height:420px; left:-120px; top:-120px; background: radial-gradient(45% 45% at 50% 50%, #8ed1c7 0%, transparent 100%); }
   .blob.b2{ width:520px; height:520px; right:-160px; top:-80px; left:auto; background: radial-gradient(45% 45% at 50% 50%, #b6d3ff 0%, transparent 100%); }
@@ -47,10 +48,11 @@
   /* tabs */
   .tabs{ display:flex; gap:8px; margin:10px 0 18px }
   .tab{
-    all:unset; cursor:pointer; font-weight:800; letter-spacing:.2px;
+    all:unset; cursor:pointer; letter-spacing:.2px;
     padding:10px 14px; border-radius:999px;
     background:linear-gradient(180deg,#ffffffcc,#f4f7ffcc);
     border:1px solid #e4e9f3; box-shadow: var(--shadow);
+    font-weight:700; /* mais leve que 800/900 */
   }
   .tab[aria-selected="true"]{
     color:#fff; border-color:transparent;
@@ -65,7 +67,7 @@
     box-shadow: var(--shadow);
     padding:22px; position:relative; overflow:hidden;
   }
-  .title{ margin:0 0 10px; font-size:clamp(22px,4vw,36px); font-weight:900; letter-spacing:.2px }
+  .title{ margin:0 0 10px; font-size:clamp(22px,4vw,36px); font-weight:700; letter-spacing:.2px } /* 700 */
 
   /* inputs & buttons */
   .row{ display:grid; gap:12px; grid-template-columns:1fr auto }
@@ -74,10 +76,10 @@
     border:1px solid #dae3f2; color:var(--ink);
     border-radius:16px; padding:14px 16px; outline:none;
     box-shadow: inset 0 1px 0 #fff, 0 6px 16px rgba(20,25,40,.06);
-    font-weight:600;
+    font-weight:500; /* menos pesado */
   }
   .field:focus{ border-color:#b7c7e6; box-shadow: inset 0 1px 0 #fff, 0 0 0 4px rgba(26,171,108,.12), 0 6px 16px rgba(20,25,40,.06) }
-  .btn{ all:unset; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:16px; cursor:pointer; font-weight:800 }
+  .btn{ all:unset; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 16px; border-radius:16px; cursor:pointer; font-weight:600 } /* 600 */
   .btn-primary{
     color:#fff; background:linear-gradient(180deg,#0d547c,#0c4160);
     box-shadow: 0 8px 22px rgba(12,65,96,.28), inset 0 1px 0 rgba(255,255,255,.18);
@@ -87,11 +89,11 @@
     background:linear-gradient(180deg,#ffffff,#f3f6ff);
     border:1px solid #e6ecf6; color:#0b2238; box-shadow: var(--shadow)
   }
-  .btn-small{ padding:6px 10px; font-size:12px; border-radius:12px }
+  .btn-small{ padding:6px 10px; font-size:12px; border-radius:12px; font-weight:600 }
   .btn-disabled{ opacity:.5; cursor:not-allowed; pointer-events:none }
 
   .helper{ margin-top:8px; display:flex; justify-content:flex-end }
-  .helper .btn{ color:#6b7c95; font-weight:700 }
+  .helper .btn{ color:#6b7c95; font-weight:600 }
 
   /* objetivos */
   .grid-obj{ display:grid; gap:16px; grid-template-columns:1fr }
@@ -103,19 +105,20 @@
     transition: transform .12s ease, box-shadow .12s ease;
   }
   .obj:hover{ transform:translateY(-3px); box-shadow: 0 16px 32px rgba(20,25,40,.14) }
-  .obj h3{ margin:0 0 8px; font-size:18px; display:flex; align-items:center; gap:10px; font-weight:900 }
+  .obj h3{ margin:0 0 8px; font-size:18px; display:flex; align-items:center; gap:10px; font-weight:700 } /* 700 */
   .obj img{ height:92px; width:auto; border-radius:16px; box-shadow: 0 8px 20px rgba(20,25,40,.12) }
 
-  .subtle{ margin:6px 0 10px; color:#6e7e95; font-weight:800; font-size:13px; letter-spacing:.3px; text-transform:uppercase }
+  .subtle{ margin:6px 0 10px; color:#6e7e95; font-weight:600; font-size:13px; letter-spacing:.3px; text-transform:uppercase }
 
   /* IA chips */
   .chips{ display:flex; flex-wrap:wrap; gap:10px }
   .chip{
-    all:unset; padding:10px 12px; border-radius:999px; font-weight:800; cursor:pointer;
+    all:unset; padding:10px 12px; border-radius:999px; cursor:pointer;
     background:linear-gradient(180deg,#ffffff,#eef3ff);
-    border:1px solid #e6ecf6; box-shadow: var(--shadow); font-size:14px;
+    border:1px solid #e6ecf6; box-shadow: var(--shadow);
+    font-size:14px; font-weight:600; /* 600 */
   }
-  .chip.plus{ font-weight:900; padding:10px 12px; }
+  .chip.plus{ font-weight:700; padding:10px 12px; }
   .hidden{ display:none }
 
   .divider{ height:1px; background:#ecf0f6; margin:18px 0 }
@@ -130,10 +133,10 @@
   }
   .toast{
     position:fixed; z-index:60; right:16px; bottom:84px; background:#0d5a86; color:#fff;
-    padding:12px 16px; border-radius:12px; box-shadow: var(--shadow); display:none; font-weight:800
+    padding:12px 16px; border-radius:12px; box-shadow: var(--shadow); display:none; font-weight:700
   }
 
-  /* modal de ação após copiar */
+  /* modal ação após copiar */
   .sheet{
     position:fixed; inset:0; display:none; place-items:center; z-index:80;
     background:rgba(10,15,25,.35); backdrop-filter:blur(4px);
@@ -145,8 +148,8 @@
     border-radius:18px; box-shadow: var(--shadow); padding:20px;
     text-align:center;
   }
-  .sheet h4{ margin:0 0 10px; font-size:18px; font-weight:900 }
-  .sheet p{ margin:0 0 16px; color:#516179; font-weight:700 }
+  .sheet h4{ margin:0 0 10px; font-size:18px; font-weight:700 } /* 700 */
+  .sheet p{ margin:0 16px 16px; color:#516179; font-weight:500 }  /* 500 */
   .sheet .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
 </style>
 </head>
@@ -193,7 +196,7 @@
             <div class="subtle">I.A.s sugeridas</div>
             <div class="chips" data-chips="aprender"></div>
             <div class="chips hidden" data-extra="aprender"></div>
-            <button class="chip plus" data-more="aprender">+</button>
+            <button class="chip plus" data-more="aprender" title="Outras IAs">+</button>
           </div>
 
           <!-- TREINAR -->
@@ -203,7 +206,7 @@
             <div class="subtle">I.A.s sugeridas</div>
             <div class="chips" data-chips="treinar"></div>
             <div class="chips hidden" data-extra="treinar"></div>
-            <button class="chip plus" data-more="treinar">+</button>
+            <button class="chip plus" data-more="treinar" title="Outras IAs">+</button>
           </div>
 
           <!-- ATUALIZAR -->
@@ -213,7 +216,7 @@
             <div class="subtle">I.A.s sugeridas</div>
             <div class="chips" data-chips="atualizar"></div>
             <div class="chips hidden" data-extra="atualizar"></div>
-            <button class="chip plus" data-more="atualizar">+</button>
+            <button class="chip plus" data-more="atualizar" title="Outras IAs">+</button>
           </div>
         </div>
       </div>
@@ -245,7 +248,7 @@
       <h4 id="sheet-title">Tudo certo!</h4>
       <p>Agora é só colar o prompt na sua I.A. e bons estudos.</p>
       <div class="actions">
-        <a id="open-chatgpt" class="btn btn-primary" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir ChatGPT</a>
+        <a id="open-ia-modal" class="btn btn-primary" href="#" target="_blank" rel="noopener">Abrir IA</a>
         <button id="sheet-close" class="btn btn-ghost">Fechar</button>
       </div>
     </div>
@@ -276,11 +279,11 @@
     reset:document.getElementById('reset'),
     sheet:document.getElementById('sheet'),
     sheetClose:document.getElementById('sheet-close'),
-    openChatGPT:document.getElementById('open-chatgpt'),
+    openIAModal:document.getElementById('open-ia-modal'),
     bookGrouped:document.getElementById('book-grouped')
   };
 
-  const BOOK_KEY='book_data_v18';
+  const BOOK_KEY='book_data_v19';
   function load(k,fb){ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(fb));}catch{return fb} }
   function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
   function pushEntry(e){ let d=load(BOOK_KEY,[]); d.unshift(e); if(d.length>200) d=d.slice(0,200); save(BOOK_KEY,d); }
@@ -341,7 +344,7 @@
     return b;
   }
 
-  /* prompts (mesmos templates anteriores, abreviados aqui) */
+  /* prompts (templates) */
   function relatedFromTheme(tema){
     const base=(tema||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
     if(!base) return ['responsabilidade civil','dano moral coletivo','nexo causal e culpa','liquidação de danos','responsabilidade médica'];
@@ -442,8 +445,12 @@ ${coreFooter(t)}`
       await navigator.clipboard.writeText(String(prompt||'')); // copia
       pushEntry({ objKey, objetivo: objKey.toUpperCase(), ia, tema: current.tema, prompt, ts: Date.now() });
       toast('Prompt copiado!');
-      enableOpenIA(ia);        // libera botão flutuante
-      openSheet();             // abre modal central (ChatGPT/Fechar)
+
+      current.lastIA = ia;
+      enableOpenIA(ia);      // botão flutuante
+      updateModalIA(ia);     // botão do modal com nome/link da IA
+
+      openSheet();           // abre modal central
     }catch{ alert('Não foi possível copiar.'); }
   }
 
@@ -467,12 +474,17 @@ ${coreFooter(t)}`
       el.openIA.setAttribute('aria-disabled','true');
     }
   }
-  enableOpenIA(null);
 
   /* modal sheet */
   function openSheet(){ el.sheet.style.display='grid'; }
   function closeSheet(){ el.sheet.style.display='none'; }
-  el.sheetClose.addEventListener('click', closeSheet);
+  function updateModalIA(ia){
+    const url = IA_LINKS[ia] || '#';
+    const btn = el.openIAModal;
+    btn.textContent = `Abrir ${ia}`;
+    btn.href = url;
+  }
+  document.getElementById('sheet-close').addEventListener('click', closeSheet);
   el.sheet.addEventListener('click', (e)=>{ if(e.target===el.sheet) closeSheet(); });
 
   /* reset */
@@ -484,7 +496,7 @@ ${coreFooter(t)}`
     closeSheet();
   });
 
-  /* arquivo agrupado */
+  /* Abas: render do Arquivo */
   function renderBookGrouped(){
     const data = load(BOOK_KEY, []);
     const box = document.getElementById('book-grouped');
@@ -494,11 +506,11 @@ ${coreFooter(t)}`
     box.innerHTML='';
     Object.keys(groups).forEach(k=>{
       const c=document.createElement('div'); c.className='card'; c.style.marginBottom='12px';
-      c.innerHTML=`<h4 style="margin:0 0 8px; font-weight:900">${k}</h4>`;
+      c.innerHTML=`<h4 style="margin:0 0 8px; font-weight:700">${k}</h4>`;
       groups[k].forEach(it=>{
         const row=document.createElement('div');
         row.style.cssText='display:flex;justify-content:space-between;gap:8px;border:1px solid #e8eef7;border-radius:12px;padding:10px;margin-bottom:8px;background:#fff';
-        row.innerHTML=`<div><b>${it.ia||'Padrão'}</b> • ${it.tema}<br><span style="color:#7a8aa1">${new Date(it.ts).toLocaleString()}</span></div>
+        row.innerHTML=`<div><b style="font-weight:600">${it.ia||'Padrão'}</b> • ${it.tema}<br><span style="color:#7a8aa1">${new Date(it.ts).toLocaleString()}</span></div>
           <div><button class="btn btn-ghost btn-small" data-copy>Copiar</button></div>`;
         row.querySelector('[data-copy]').addEventListener('click', async ()=>{
           try{ await navigator.clipboard.writeText(String(it.prompt||'')); toast('Copiado!'); }catch{ alert('Não foi possível copiar.'); }
@@ -509,7 +521,7 @@ ${coreFooter(t)}`
     });
   }
 
-  /* iniciar SW (opcional) */
+  /* SW (opcional) */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
   }
